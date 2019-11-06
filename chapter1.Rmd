@@ -1,4 +1,15 @@
 
 # About the project
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you can use R Markdown syntax.*
+**Introduction ~~Warmup~~**
+
+"Introduction"
+
+"It is a good beginning. The task in DataCamp is friendly to beginners."
+
+"Clustering and classification, and dimensionality reduction techniques are the two parts I am most interested in."
+
+"I heard this course via email sent to HYMY students."
+
+"My github repository is at:<https://github.com/yufanyin/IODS-project>
+
