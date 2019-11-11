@@ -1,5 +1,5 @@
 
-# About the project
+# Chapter 1 Start up
 
 **Introduction ~~Warmup~~**
 
@@ -9,5 +9,16 @@ Clustering and classification, and dimensionality reduction techniques are the t
 
 I heard this course via email sent to HYMY students.
 
-My github repository is at: <https://github.com/yufanyin/IODS-project>
+The link to my github repository:
 
+<https://github.com/yufanyin/IODS-project>
+
+The link to my course diary:
+
+<https://yufanyin.github.io/IODS-project/>
+
+**work through the DataCamp:**
+
+DataCamp 1 Hello R
+
+DataCamp 2 Getting Hooked on R
