@@ -7,14 +7,36 @@
 # read the data into memory
 lrn14 <- read.table("https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep="\t", header=JYTOPKYS3-data)
 
-# Look at the dimensions of the data
+# 2.1 Look at the dimensions of the data
 dim(lrn14)
 
-# Look at the structure of the data
+# 2.2 Look at the structure of the data
 str(lrn14)
 
-# [1] 183  60
-
-# 'data.frame':	183 obs. of  60 variables:
+# 'data.frame':	183 obs. of  60 variables
 # gender  : Factor w/ 2 levels "F","M"
 # other variables (Age, Attitude, Points, Aa, ... , ST01, ...): int
+
+# 3.1 Create an analysis dataset with the 7 variables
+library(dplyr)
+keep_columns <- c("gender","age","attitude", "deep", "stra", "surf", "points")
+learning2014 <- select(lrn14, one_of(keep_columns))
+learning2014
+
+# 3.2 Scale all combination variables to the original scales
+deep_questions <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")
+strategic_questions <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28")
+surface_questions <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32")
+
+deep_columns <- select(lrn14, one_of(deep_questions))
+lrn14$deep <- rowMeans(deep_columns)
+
+strategic_columns <- select(lrn14, one_of(strategic_questions))
+lrn14$str <- rowMeans(strategic_columns)
+
+surface_columns <- select(lrn14, one_of(surface_questions))
+lrn14$surf <- rowMeans(surface_columns)
+
+# 3.3 Exclude observations where the exam points variable is zero
+learning2014 <- filter(learning2014, points > 0)
+
