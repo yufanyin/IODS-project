@@ -1,17 +1,20 @@
 # Chapter 2 Regression and model validation
 
-11.11.2019
-*Describe the work you have done this week and summarize your learning.*
+- Worked through the DataCamp and finished:
 
-**work through the DataCamp:**
+  DataCamp 3 Regression and model validation
 
-DataCamp 3 Regression and model validation
+- Worked on R script for Exercise 2:
 
-**2.1 Data wrangling**
+  Data wrangling and regression analysis
+
+  (5.11.-11.11.2019)
+
+# 2.1 Data wrangling
 
 *read the data into memory*
 
-lrn14 <- read.table("https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep="\t", header=JYTOPKYS3-data)
+lrn14 <- read.table("https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep="\t", header=TRUE)
 
 **Step 1**
 *Create the ‘data’ folder and new R script*
@@ -77,6 +80,7 @@ learning2014 <- filter(learning2014, points > 0)
 *Save in the iods project folder*
 
 
-**2.2 Analysis**
+
+# 2.2 Analysis
 
 

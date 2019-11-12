@@ -1,0 +1,19 @@
+# Chapter 3: Logistic regression
+
+- Worked through the DataCamp and finished:
+
+  DataCamp 4 Logistic regression
+  
+- Worked on R script for Exercise 2:
+
+  Data wrangling and regression analysis
+  
+  (12.11.-18.11.2019)
+
+# 3.1 Data wrangling
+
+
+
+# 3.2 Analysis
+
+
