@@ -4,6 +4,8 @@
 # reference to the data source:
 # https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt
 
+# Hi reviewer, please see the newest version (2.1 Data wrangling) in chapter2.rmd
+
 # read the data into memory
 lrn14 <- read.table("https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep="\t", header=JYTOPKYS3-data)
 
