@@ -21,7 +21,7 @@
 ### Read the data file
 (Step 1)
 
-```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r}
 setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
 lrn14 <- read.table(file = "JYTOPKYS3-data.txt", sep="\t", header=TRUE)
 ```
@@ -33,14 +33,14 @@ lrn14 <- read.table(file = "JYTOPKYS3-data.txt", sep="\t", header=TRUE)
 ### Look at the dimensions of the data
 (Step 2a)
 
-```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r}
 dim(lrn14)
 ```
 
 ### Look at the structure of the data
 (Step 2b)
 
-```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r}
 str(lrn14)
 ```
 
@@ -51,13 +51,13 @@ The data consists of 183 observations in 60 variables. Apart from 'gender', all 
 ### Scale all combination variables to the original scales by taking the mean
 (Step 3b)
 
-```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r}
 deep_questions <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")
 strategic_questions <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28")
 surface_questions <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32")
 ```
 
-```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r}
 deep_columns <- select(lrn14, one_of(deep_questions))
 lrn14$deep <- rowMeans(deep_columns)
 
@@ -68,7 +68,7 @@ surface_columns <- select(lrn14, one_of(surface_questions))
 lrn14$surf <- rowMeans(surface_columns)
 ```
 
-```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r}
 library(dplyr)
 keep_columns <- c("gender","Age","Attitude","deep","stra","surf","Points")
 learning2014 <- select(lrn14, one_of(keep_columns))
@@ -83,7 +83,7 @@ learning2014$attitude <- learning2014$attitude/10
 ### Exclude observations where the exam points variable is zero
 (Step 3c)
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 learning2014 <- filter(learning2014, points > 0)
 str(learning2014)
 ```
@@ -108,20 +108,20 @@ First the the working directory is set and then I save the dataframe with `write
 
 Set the working directory to IODS project folder with 'setwd()' functions. (Step 4a)
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 setwd("~/IODS-project")
 ```
 
 Save the analysis dataset to the "data" folder (Step 4b)
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 write.table(learning2014, file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt", sep = "\t", col.names = TRUE, row.names = TRUE)
 write.csv(learning2014, file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.csv", row.names = FALSE)
 ```
 
 Check whether the tables can be read using the 'read.table()' and 'read.csv()' function and show the first 6 observations. (Step 4c) 
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 read.table(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt") %>% head()
 read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.csv") %>%head()
 ```  
@@ -143,7 +143,7 @@ gender age attitude deep stra surf points
 
 Read the data file (Step 1a)
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 learning2014 <- 
 read.table(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt", stringsAsFactors = TRUE) 
 
@@ -170,7 +170,7 @@ The data 'learning2014' consists of 166 observations and 7 variables. It contain
 
 Correlations of the observations between the different variables are shown below with `ggpairs()` function.
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 library(ggplot2)
 library(GGally)
 p1 <- ggpairs(learning2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)), upper = list(continuous = wrap("cor", size = 2.8)))
@@ -188,7 +188,7 @@ In the upper right part presents how one variable correlates to another varibabl
 **Simple regression: point ~ gender**
 Firstly we choose gender as explanatory variables and fit a regression model in which exam points is the dependent variable. Result: not significant.
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 gender_lm <- lm(points ~ gender, data = learning2014)
 summary(gender_lm)
 ```
@@ -216,7 +216,7 @@ F-statistic: 1.428 on 1 and 164 DF,  p-value: 0.2338
 
 **Simple regression: point ~ attitude**
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 gender_lm <- lm(points ~ attitude, data = learning2014)
 summary(gender_lm)
 ```
@@ -242,13 +242,13 @@ F-statistic: 38.61 on 1 and 164 DF,  p-value: 4.119e-09
 ```
 There is a statistical relationship between point and attitude (p:4.12e-09). Then draw a scatter plot of points versus attitude, fit a linear model and print out the summary.
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 qplot(attitude, points, data = learning2014) + geom_smooth(method = "lm")
 ```
 
 http://127.0.0.1:42872/chunk_output/DC8623CAB88836EA/A5B1EE4E/c5p8rg484lt8q/000002.png
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 model_point_attitude <- lm(points ~ attitude, data = learning2014)
 model_point_attitude
 ```
@@ -269,7 +269,7 @@ Coefficients:
 **Multiple regression model: point ~ attitude + stra**
 This multiple regression is to test whether strategic learning has an influence on points. The p-value (0.08) shows that the significance of the influence is not very strong. The multiple R-squared is a bit higher than that in regression model of points ~ attitude. That means a little higher correlations if strategic learning is taken into account.
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 model_p_att_stra <- lm(points ~ attitude + stra, data = learning2014)
 model_p_att_stra_s <- summary(model_p_att_stra)
 model_p_att_stra_s
@@ -305,7 +305,7 @@ The residuals is close to the 0 line, which means that the relationship is linea
 
 According to Nomal Q-Q plot, most of the values fall on the straight line. The outliers cause randomness in the dataset.
 
-```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+```{r}
 plot(model_p_att_stra, which=c(1,2,5))
 ```
 
