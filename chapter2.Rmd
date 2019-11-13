@@ -9,78 +9,309 @@
   Data wrangling and regression analysis
 
   (5.11.-11.11.2019)
+  
+**Note:** 1.'(Step N)' is used for reviewers to check my work queicky.
 
-# 2.1 Data wrangling
-
-*read the data into memory*
-
-lrn14 <- read.table("https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep="\t", header=TRUE)
-
-**Step 1**
-*Create the ‘data’ folder and new R script*
+2. Sometimes I was not sure whether I save the figures and tables so that I did not delete many details.
 
 
-**Step 2a**
-*Look at the dimensions of the data*
 
+## 2.1 Data wrangling
+
+### Read the data file
+(Step 1)
+
+```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
+lrn14 <- read.table(file = "JYTOPKYS3-data.txt", sep="\t", header=TRUE)
+```
+
+**Note:** *I cannot open the connection if*
+
+*read.table(file = "https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep = "\t", header = TRUE)*
+                
+### Look at the dimensions of the data
+(Step 2a)
+
+```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 dim(lrn14)
+```
 
+### Look at the structure of the data
+(Step 2b)
 
-**Step 2b**
-*Look at the structure of the data*
-
+```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 str(lrn14)
+```
 
-**data.frame: 183 obs. of 60 variables**
+The data consists of 183 observations in 60 variables. Apart from 'gender', all other variables (Age, Attitude, Points, Aa, ... , ST01, ...) are int.
 
-**gender  : Factor w/ 2 levels "F","M"**
+### Create an analysis dataset with the 7 variables
+(Step 3a)
+### Scale all combination variables to the original scales by taking the mean
+(Step 3b)
 
-**other variables (Age, Attitude, Points, Aa, ... , ST01, ...): int**
-
-
-**Step 3a**
-*Create an analysis dataset with the 7 variables*
-
-library(dplyr)
-
-keep_columns <- c("gender","age","attitude", "deep", "stra", "surf", "points")
-
-learning2014 <- select(lrn14, one_of(keep_columns))
-
-learning2014
-
-
-**Step 3b**
-*Scale all combination variables to the original scales*
-
+```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 deep_questions <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")
-
 strategic_questions <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28")
-
 surface_questions <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32")
+```
 
+```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 deep_columns <- select(lrn14, one_of(deep_questions))
 lrn14$deep <- rowMeans(deep_columns)
 
 strategic_columns <- select(lrn14, one_of(strategic_questions))
-
-lrn14$str <- rowMeans(strategic_columns)
+lrn14$stra <- rowMeans(strategic_columns)
 
 surface_columns <- select(lrn14, one_of(surface_questions))
-
 lrn14$surf <- rowMeans(surface_columns)
+```
 
+```{r, readdata1, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+keep_columns <- c("gender","Age","Attitude","deep","stra","surf","Points")
+learning2014 <- select(lrn14, one_of(keep_columns))
+colnames(learning2014)[2] <- "age"
+colnames(learning2014)[3] <- "attitude"
+colnames(learning2014)[7] <- "points"
+colnames(learning2014)
 
-**Step 3c**
-*Exclude observations where the exam points variable is zero*
+learning2014$attitude <- learning2014$attitude/10
+```
 
+### Exclude observations where the exam points variable is zero
+(Step 3c)
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
 learning2014 <- filter(learning2014, points > 0)
+str(learning2014)
+```
 
-**Step 4**
-*Save in the iods project folder*
+The data 'learning2014' consists of 166 observations and 7 variables.
+
+```
+ 'data.frame':	166 obs. of  7 variables:
+ gender  : Factor w/ 2 levels "F","M": 1 2 1 2 2 1 2 1 2 1 ...
+ age     : int  53 55 49 53 49 38 50 37 37 42 ...
+ attitude: num  3.7 3.1 2.5 3.5 3.7 3.8 3.5 2.9 3.8 2.1 ...
+ deep    : num  3.58 2.92 3.5 3.5 3.67 ...
+ stra    : num  3.38 2.75 3.62 3.12 3.62 ...
+ surf    : num  2.58 3.17 2.25 2.25 2.83 ...
+ points  : int  25 12 24 10 22 21 21 31 24 26 ...
+```
+
+### Save in the iods project folder
+(Step 4)
+
+First the the working directory is set and then I save the dataframe with `write.table()` and the `write.csv()`functions.
+
+Set the working directory to IODS project folder with 'setwd()' functions. (Step 4a)
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+setwd("~/IODS-project")
+```
+
+Save the analysis dataset to the "data" folder (Step 4b)
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+write.table(learning2014, file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt", sep = "\t", col.names = TRUE, row.names = TRUE)
+write.csv(learning2014, file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.csv", row.names = FALSE)
+```
+
+Check whether the tables can be read using the 'read.table()' and 'read.csv()' function and show the first 6 observations. (Step 4c) 
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+read.table(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt") %>% head()
+read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.csv") %>%head()
+```  
+  
+```
+gender age attitude deep stra surf points
+1	F	53	3.7	3.583333	3.375	2.583333	25
+2	M	55	3.1	2.916667	2.750	3.166667	12
+3	F	49	2.5	3.500000	3.625	2.250000	24
+4	M	53	3.5	3.500000	3.125	2.250000	10
+5	M	49	3.7	3.666667	3.625	2.833333	22
+6	F	38	3.8	4.750000	3.625	2.416667	21
+6 rows
+```
+
+## 2.2 Performing and interpreting regression analysis
+
+### 2.2.1 Reading the data
+
+Read the data file (Step 1a)
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+learning2014 <- 
+read.table(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt", stringsAsFactors = TRUE) 
+
+learning2014 %>% str()
+```
+
+Describe the dataset briefly (Step 1b)
+
+The data 'learning2014' consists of 166 observations and 7 variables. It contains students' approaches to learning (deep, stra, surf), scores of attitude, points and some background information (gender, age).
+
+```
+'data.frame':	166 obs. of  7 variables:
+ $ gender  : Factor w/ 2 levels "F","M": 1 2 1 2 2 1 2 1 2 1 ...
+ $ age     : int  53 55 49 53 49 38 50 37 37 42 ...
+ $ attitude: num  3.7 3.1 2.5 3.5 3.7 3.8 3.5 2.9 3.8 2.1 ...
+ $ deep    : num  3.58 2.92 3.5 3.5 3.67 ...
+ $ stra    : num  3.38 2.75 3.62 3.12 3.62 ...
+ $ surf    : num  2.58 3.17 2.25 2.25 2.83 ...
+ $ points  : int  25 12 24 10 22 21 21 31 24 26 ...
+```
+
+### 2.2.2 Visualizations with ggplot2
+(Step 2)
+
+Correlations of the observations between the different variables are shown below with `ggpairs()` function.
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+library(ggplot2)
+library(GGally)
+p1 <- ggpairs(learning2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)), upper = list(continuous = wrap("cor", size = 2.8)))
+p1
+```
+
+http://127.0.0.1:42872/chunk_output/DC8623CAB88836EA/A5B1EE4E/cd2f6s6tn8gxk/000002.png
+
+The plot shows the data distribution of all the 166 observations of each variable. The colours represent different gender. Female students are shown in red and male students in verdant.
+In the upper right part presents how one variable correlates to another varibable. We are able to find possible significant regression result.
+
+### 2.2.3 Simple regression with lm()
+(Step 3)
+
+**Simple regression: point ~ gender**
+Firstly we choose gender as explanatory variables and fit a regression model in which exam points is the dependent variable. Result: not significant.
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+gender_lm <- lm(points ~ gender, data = learning2014)
+summary(gender_lm)
+```
+
+```
+Call:
+lm(formula = points ~ gender, data = learning2014)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-15.3273  -3.3273   0.5179   4.5179  10.6727 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  22.3273     0.5613  39.776   <2e-16 ***
+genderM       1.1549     0.9664   1.195    0.234    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 5.887 on 164 degrees of freedom
+Multiple R-squared:  0.008632,	Adjusted R-squared:  0.002587 
+F-statistic: 1.428 on 1 and 164 DF,  p-value: 0.2338
+```
 
 
+**Simple regression: point ~ attitude**
 
-# 2.2 Analysis
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+gender_lm <- lm(points ~ attitude, data = learning2014)
+summary(gender_lm)
+```
 
+```
+Call:
+lm(formula = points ~ attitude, data = learning2014)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-16.9763  -3.2119   0.4339   4.1534  10.6645 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  11.6372     1.8303   6.358 1.95e-09 ***
+attitude      3.5255     0.5674   6.214 4.12e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 5.32 on 164 degrees of freedom
+Multiple R-squared:  0.1906,	Adjusted R-squared:  0.1856 
+F-statistic: 38.61 on 1 and 164 DF,  p-value: 4.119e-09
+```
+There is a statistical relationship between point and attitude (p:4.12e-09). Then draw a scatter plot of points versus attitude, fit a linear model and print out the summary.
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+qplot(attitude, points, data = learning2014) + geom_smooth(method = "lm")
+```
+
+http://127.0.0.1:42872/chunk_output/DC8623CAB88836EA/A5B1EE4E/c5p8rg484lt8q/000002.png
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+model_point_attitude <- lm(points ~ attitude, data = learning2014)
+model_point_attitude
+```
+
+```
+Call:
+lm(formula = points ~ attitude, data = learning2014)
+
+Coefficients:
+(Intercept)     attitude  
+     11.637        3.525  
+     
+```
+
+### 2.2.4 Multiple regression
+(Step 4)
+
+**Multiple regression model: point ~ attitude + stra**
+This multiple regression is to test whether strategic learning has an influence on points. The p-value (0.08) shows that the significance of the influence is not very strong. The multiple R-squared is a bit higher than that in regression model of points ~ attitude. That means a little higher correlations if strategic learning is taken into account.
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+model_p_att_stra <- lm(points ~ attitude + stra, data = learning2014)
+model_p_att_stra_s <- summary(model_p_att_stra)
+model_p_att_stra_s
+```
+
+```
+Call:
+lm(formula = points ~ attitude + stra, data = learning2014)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-17.6436  -3.3113   0.5575   3.7928  10.9295 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   8.9729     2.3959   3.745  0.00025 ***
+attitude      3.4658     0.5652   6.132 6.31e-09 ***
+stra          0.9137     0.5345   1.709  0.08927 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 5.289 on 163 degrees of freedom
+Multiple R-squared:  0.2048,	Adjusted R-squared:  0.1951 
+F-statistic: 20.99 on 2 and 163 DF,  p-value: 7.734e-09
+```
+
+### 2.2.5 Diagnostic plots
+(Step 5)
+
+The results of diagnostic plots are in accordance with the regression model. 
+
+The residuals is close to the 0 line, which means that the relationship is linear. Not many outliers (35, 56,145) are significantly disturbing the analysis but they raise errors in the dataset.
+
+According to Nomal Q-Q plot, most of the values fall on the straight line. The outliers cause randomness in the dataset.
+
+```{r, structure, echo=TRUE, results='markup', message=FALSE, warning=FALSE}
+plot(model_p_att_stra, which=c(1,2,5))
+```
+
+http://127.0.0.1:42872/chunk_output/DC8623CAB88836EA/A5B1EE4E/c4jdrj7wils0g/000004.png?fixed_size=1
+
+http://127.0.0.1:42872/chunk_output/DC8623CAB88836EA/A5B1EE4E/c4jdrj7wils0g/000005.png?fixed_size=1
+
+http://127.0.0.1:42872/chunk_output/DC8623CAB88836EA/A5B1EE4E/c4jdrj7wils0g/000006.png
 
