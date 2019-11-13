@@ -52,12 +52,14 @@ The data consists of 183 observations in 60 variables. Apart from 'gender', all 
 (Step 3b)
 
 ```{r}
+library(dplyr)
 deep_questions <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")
 strategic_questions <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28")
 surface_questions <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32")
 ```
 
 ```{r}
+library(dplyr)
 deep_columns <- select(lrn14, one_of(deep_questions))
 lrn14$deep <- rowMeans(deep_columns)
 
@@ -125,17 +127,6 @@ Check whether the tables can be read using the 'read.table()' and 'read.csv()' f
 read.table(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt") %>% head()
 read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.csv") %>%head()
 ```  
-  
-```
-gender age attitude deep stra surf points
-1	F	53	3.7	3.583333	3.375	2.583333	25
-2	M	55	3.1	2.916667	2.750	3.166667	12
-3	F	49	2.5	3.500000	3.625	2.250000	24
-4	M	53	3.5	3.500000	3.125	2.250000	10
-5	M	49	3.7	3.666667	3.625	2.833333	22
-6	F	38	3.8	4.750000	3.625	2.416667	21
-6 rows
-```
 
 ## 2.2 Performing and interpreting regression analysis
 
@@ -153,17 +144,6 @@ learning2014 %>% str()
 Describe the dataset briefly (Step 1b)
 
 The data 'learning2014' consists of 166 observations and 7 variables. It contains students' approaches to learning (deep, stra, surf), scores of attitude, points and some background information (gender, age).
-
-```
-'data.frame':	166 obs. of  7 variables:
- $ gender  : Factor w/ 2 levels "F","M": 1 2 1 2 2 1 2 1 2 1 ...
- $ age     : int  53 55 49 53 49 38 50 37 37 42 ...
- $ attitude: num  3.7 3.1 2.5 3.5 3.7 3.8 3.5 2.9 3.8 2.1 ...
- $ deep    : num  3.58 2.92 3.5 3.5 3.67 ...
- $ stra    : num  3.38 2.75 3.62 3.12 3.62 ...
- $ surf    : num  2.58 3.17 2.25 2.25 2.83 ...
- $ points  : int  25 12 24 10 22 21 21 31 24 26 ...
-```
 
 ### 2.2.2 Visualizations with ggplot2
 (Step 2)
@@ -193,27 +173,6 @@ gender_lm <- lm(points ~ gender, data = learning2014)
 summary(gender_lm)
 ```
 
-```
-Call:
-lm(formula = points ~ gender, data = learning2014)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--15.3273  -3.3273   0.5179   4.5179  10.6727 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  22.3273     0.5613  39.776   <2e-16 ***
-genderM       1.1549     0.9664   1.195    0.234    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 5.887 on 164 degrees of freedom
-Multiple R-squared:  0.008632,	Adjusted R-squared:  0.002587 
-F-statistic: 1.428 on 1 and 164 DF,  p-value: 0.2338
-```
-
-
 **Simple regression: point ~ attitude**
 
 ```{r}
@@ -221,25 +180,6 @@ gender_lm <- lm(points ~ attitude, data = learning2014)
 summary(gender_lm)
 ```
 
-```
-Call:
-lm(formula = points ~ attitude, data = learning2014)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--16.9763  -3.2119   0.4339   4.1534  10.6645 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  11.6372     1.8303   6.358 1.95e-09 ***
-attitude      3.5255     0.5674   6.214 4.12e-09 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 5.32 on 164 degrees of freedom
-Multiple R-squared:  0.1906,	Adjusted R-squared:  0.1856 
-F-statistic: 38.61 on 1 and 164 DF,  p-value: 4.119e-09
-```
 There is a statistical relationship between point and attitude (p:4.12e-09). Then draw a scatter plot of points versus attitude, fit a linear model and print out the summary.
 
 ```{r}
@@ -253,16 +193,6 @@ model_point_attitude <- lm(points ~ attitude, data = learning2014)
 model_point_attitude
 ```
 
-```
-Call:
-lm(formula = points ~ attitude, data = learning2014)
-
-Coefficients:
-(Intercept)     attitude  
-     11.637        3.525  
-     
-```
-
 ### 2.2.4 Multiple regression
 (Step 4)
 
@@ -273,27 +203,6 @@ This multiple regression is to test whether strategic learning has an influence 
 model_p_att_stra <- lm(points ~ attitude + stra, data = learning2014)
 model_p_att_stra_s <- summary(model_p_att_stra)
 model_p_att_stra_s
-```
-
-```
-Call:
-lm(formula = points ~ attitude + stra, data = learning2014)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--17.6436  -3.3113   0.5575   3.7928  10.9295 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)   8.9729     2.3959   3.745  0.00025 ***
-attitude      3.4658     0.5652   6.132 6.31e-09 ***
-stra          0.9137     0.5345   1.709  0.08927 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 5.289 on 163 degrees of freedom
-Multiple R-squared:  0.2048,	Adjusted R-squared:  0.1951 
-F-statistic: 20.99 on 2 and 163 DF,  p-value: 7.734e-09
 ```
 
 ### 2.2.5 Diagnostic plots
