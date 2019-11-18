@@ -1,6 +1,6 @@
 # Chapter 3: Logistic regression
 # Yufan
-# 11.11.2019
+# 18.11.2019
 # reference to the data source:
 # https://archive.ics.uci.edu/ml/machine-learning-databases/00320/
 
@@ -113,8 +113,3 @@ write.csv(alc, file = "G:/C-Open Data Science/0-191030/IODS-project-master/alc.c
 
 # Check if the file can be read
 read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/alc.csv") %>% head()
-
-
-
-
-
