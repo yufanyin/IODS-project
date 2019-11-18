@@ -4,13 +4,59 @@
 
   DataCamp 4 Logistic regression
   
-- Worked on R script for Exercise 3:
-
-  
+- Worked on R script for Exercise 3
   
   (12.11.-18.11.2019)
+  
+**Note:** 1.'(Step N)' is used for reviewers to check my work queicky.
 
-## 3.1 
+2.Somehow I cannot seperate the code of data wrangling from Chapter3.rmd.
+
+
+## 3.1 Data wrangling
+
+### Read the data file
+(Step 1)
+
+```{r}
+getwd()
+setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
+mat <- read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/student-mat.csv", sep = ";", header = TRUE)
+```
+
+```{r}
+getwd()
+setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
+por <- read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/student-por.csv", sep = ";", header = TRUE)
+```
+
+*Note: I was unable to upload or create a new file named 'data' in github page. Correspondingly, I did not create the data folder and move the two .csv files in.*
+
+### Explore the structure and dimensions of the data
+
+```{r}
+head(mat)
+dim(mat)
+str(mat)
+```
+
+```{r}
+head(por)
+dim(por)
+str(por)
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
