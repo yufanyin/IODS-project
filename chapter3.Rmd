@@ -1,50 +1,29 @@
 # Chapter 3: Logistic regression
 
-- Worked through the DataCamp and finished:
+(12.11.-18.11.2019)
+ 
+- **Work through the DataCamp**
 
-  DataCamp 4 Logistic regression
+    DataCamp 4 Logistic regression
   
-- Worked on R script for Exercise 3
-  
-  (12.11.-18.11.2019)
-  
-**Note:** 1.'(Step N)' is used for reviewers to check my work queicky.
+- **Data wrangling**
 
-2.Somehow I cannot seperate the code of data wrangling from Chapter3.rmd.
+    R script of data Wrangling exercise is available here.
+
+    https://github.com/yufanyin/IODS-project/blob/master/create_alc.R
+
+    The result was saved as 'alc.csv'.
+
+**Note:** '(Step N)' is used for reviewers to check my work queicky.
 
 
-## 3.1 Data wrangling
+## 3.1 
 
-### Read the data file
 (Step 1)
 
-```{r}
-getwd()
-setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
-mat <- read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/student-mat.csv", sep = ";", header = TRUE)
-```
 
-```{r}
-getwd()
-setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
-por <- read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/student-por.csv", sep = ";", header = TRUE)
-```
 
-*Note: I was unable to upload or create a new file named 'data' in github page. Correspondingly, I did not create the data folder and move the two .csv files in.*
-
-### Explore the structure and dimensions of the data
-
-```{r}
-head(mat)
-dim(mat)
-str(mat)
-```
-
-```{r}
-head(por)
-dim(por)
-str(por)
-```
+### Read the prepared data set
 
 
 
@@ -53,12 +32,4 @@ str(por)
 
 
 
-
-
-
-
-
-
-
-## 3.2 
 

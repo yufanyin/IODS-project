@@ -1,151 +1,38 @@
 # Chapter 2 Regression and model validation
 
-- Worked through the DataCamp and finished:
+(5.11.-11.11.2019)
 
-  DataCamp 3 Regression and model validation
+- **Work through the DataCamp**
 
-- Worked on R script for Exercise 2:
+    DataCamp 3 Regression and model validation
 
-  Data wrangling and regression analysis
+- **Data wrangling**
 
-  (5.11.-11.11.2019)
-  
-**Note:** 1.'(Step N)' is used for reviewers to check my work queicky.
+    R script of data Wrangling exercise is available here.
 
-2. Sometimes I was not sure whether I save the figures and tables so that I did not delete many details.
+    https://github.com/yufanyin/IODS-project/blob/master/create_learning2014.R
+
+    The result was saved as 'learning2014.csv'.
+
+**Note:** '(Step N)' is used for reviewers to check my work queicky.
 
 
-
-## 2.1 Data wrangling
-
-### Read the data file
-(Step 1)
-
-```{r}
-setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
-lrn14 <- read.table(file = "JYTOPKYS3-data.txt", sep="\t", header=TRUE)
-```
-
-**Note:** *I cannot open the connection if*
-
-*read.table(file = "https://www.mv.helsinki.fi/home/kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep = "\t", header = TRUE)*
-                
-### Look at the dimensions of the data
-(Step 2a)
-
-```{r}
-dim(lrn14)
-```
-
-### Look at the structure of the data
-(Step 2b)
-
-```{r}
-str(lrn14)
-```
-
-The data consists of 183 observations in 60 variables. Apart from 'gender', all other variables (Age, Attitude, Points, Aa, ... , ST01, ...) are int.
-
-### Create an analysis dataset with the 7 variables
-(Step 3a)
-### Scale all combination variables to the original scales by taking the mean
-(Step 3b)
-
-```{r}
-library(dplyr)
-deep_questions <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")
-strategic_questions <- c("ST01","ST09","ST17","ST25","ST04","ST12","ST20","ST28")
-surface_questions <- c("SU02","SU10","SU18","SU26", "SU05","SU13","SU21","SU29","SU08","SU16","SU24","SU32")
-```
-
-```{r}
-library(dplyr)
-deep_columns <- select(lrn14, one_of(deep_questions))
-lrn14$deep <- rowMeans(deep_columns)
-
-strategic_columns <- select(lrn14, one_of(strategic_questions))
-lrn14$stra <- rowMeans(strategic_columns)
-
-surface_columns <- select(lrn14, one_of(surface_questions))
-lrn14$surf <- rowMeans(surface_columns)
-```
-
-```{r}
-library(dplyr)
-keep_columns <- c("gender","Age","Attitude","deep","stra","surf","Points")
-learning2014 <- select(lrn14, one_of(keep_columns))
-colnames(learning2014)[2] <- "age"
-colnames(learning2014)[3] <- "attitude"
-colnames(learning2014)[7] <- "points"
-colnames(learning2014)
-
-learning2014$attitude <- learning2014$attitude/10
-```
-
-### Exclude observations where the exam points variable is zero
-(Step 3c)
-
-```{r}
-learning2014 <- filter(learning2014, points > 0)
-str(learning2014)
-```
-
-The data 'learning2014' consists of 166 observations and 7 variables.
-
-```
- 'data.frame':	166 obs. of  7 variables:
- gender  : Factor w/ 2 levels "F","M": 1 2 1 2 2 1 2 1 2 1 ...
- age     : int  53 55 49 53 49 38 50 37 37 42 ...
- attitude: num  3.7 3.1 2.5 3.5 3.7 3.8 3.5 2.9 3.8 2.1 ...
- deep    : num  3.58 2.92 3.5 3.5 3.67 ...
- stra    : num  3.38 2.75 3.62 3.12 3.62 ...
- surf    : num  2.58 3.17 2.25 2.25 2.83 ...
- points  : int  25 12 24 10 22 21 21 31 24 26 ...
-```
-
-### Save in the iods project folder
-(Step 4)
-
-First the the working directory is set and then I save the dataframe with `write.table()` and the `write.csv()`functions.
-
-Set the working directory to IODS project folder with 'setwd()' functions. (Step 4a)
-
-```{r}
-setwd("~/IODS-project")
-```
-
-Save the analysis dataset to the "data" folder (Step 4b)
-
-```{r}
-write.table(learning2014, file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt", sep = "\t", col.names = TRUE, row.names = TRUE)
-write.csv(learning2014, file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.csv", row.names = FALSE)
-```
-
-Check whether the tables can be read using the 'read.table()' and 'read.csv()' function and show the first 6 observations. (Step 4c) 
-
-```{r}
-read.table(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt") %>% head()
-read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.csv") %>%head()
-```  
-
-## 2.2 Performing and interpreting regression analysis
-
-### 2.2.1 Reading the data
+## 2.1 Reading the data
 
 Read the data file (Step 1a)
 
 ```{r}
 learning2014 <- 
 read.table(file = "G:/C-Open Data Science/0-191030/IODS-project-master/learning2014.txt", stringsAsFactors = TRUE) 
-
-learning2014 %>% str()
+str(learning2014)
 ```
 
-Describe the dataset briefly (Step 1b)
+Describe the dataset briefly
+(Step 1b)
 
 The data 'learning2014' consists of 166 observations and 7 variables. It contains students' approaches to learning (deep, stra, surf), scores of attitude, points and some background information (gender, age).
 
-### 2.2.2 Visualizations with ggplot2
+## 2.2 Visualizations with ggplot2
 (Step 2)
 
 Correlations of the observations between the different variables are shown below with `ggpairs()` function.
@@ -162,7 +49,7 @@ http://127.0.0.1:42872/chunk_output/DC8623CAB88836EA/A5B1EE4E/cd2f6s6tn8gxk/0000
 The plot shows the data distribution of all the 166 observations of each variable. The colours represent different gender. Female students are shown in red and male students in verdant.
 In the upper right part presents how one variable correlates to another varibable. We are able to find possible significant regression result.
 
-### 2.2.3 Simple regression with lm()
+## 2.3 Simple regression with lm()
 (Step 3)
 
 **Simple regression: point ~ gender**
@@ -193,7 +80,7 @@ model_point_attitude <- lm(points ~ attitude, data = learning2014)
 model_point_attitude
 ```
 
-### 2.2.4 Multiple regression
+## 2.4 Multiple regression
 (Step 4)
 
 **Multiple regression model: point ~ attitude + stra**
@@ -205,7 +92,7 @@ model_p_att_stra_s <- summary(model_p_att_stra)
 model_p_att_stra_s
 ```
 
-### 2.2.5 Diagnostic plots
+## 2.5 Diagnostic plots
 (Step 5)
 
 The results of diagnostic plots are in accordance with the regression model. 
