@@ -17,19 +17,229 @@
 **Note:** '(Step N)' is used for reviewers to check my work queicky.
 
 
-## 3.1 
+## 3.1 Reading the data
 
-(Step 1)
+**Read the data file (Step 2a)**
+
+```{r}
+getwd()
+setwd("G:/C-Open Data Science/0-191030/IODS-project-master")
+alc <- read.csv(file = "G:/C-Open Data Science/0-191030/IODS-project-master/alc.csv")
+```
+
+**Print out the names of the variables in the data (Step 2b)**
+```{r}
+dim(alc)
+colnames(alc)
+str(alc)
+```
+
+**Describe the data set briefly (Step 2c)**
+
+The data consists of 382 observations in 35 variables.
+
+**Note: ** It shows 36 variables. Why the first colname is "X" (int  1 2 3 4 5 6 7 8 9 10 ...)?
+
+The data were collected by using school reports and questionnaires from students in two Portugal secondary schools. They included students' grades, demographic characteristics,  social and school related features.
+
+The two data sets provided students' performance in Mathematics (mat) and Portuguese language (por). After data wrangling part, they were merged into one data set "alc".  
+
+To analyse alcohol consumption, two new variables were created. "alc_use" is the average of weekday ("Dalc") and weekend ("Walc") alcohol consumption. "high_use" is the logical value created if the "alc_use" of a student is higher than 2 (TRUE).
+
+Data source: https://archive.ics.uci.edu/ml/datasets/Student+Performance
+
+
+## 3.2 Hypotheses about the relationships between alcohol consumption and specific variables
+
+**Choose variables and write hypotheses (Step 3)**
+
+The purpose of the following analysis is to explore the relationships between high/low alcohol consumption and some variables. I chose the following four variables:
+
+'sex': student’s sex (binary: ‘F’ - female or ‘M’ - male)
+
+'failures': number of past class failures (numeric: n if 1<=n<3, else 4)
+
+'goout': going out with friends (numeric: from 1 - very low to 5 - very high)
+
+'absences': number of school absences (numeric: from 0 to 93)
+
+The hypotheses are as follows.
+
+**Hypothesis 1:** There is gender difference ('sex') in alcohol consumption. In social science, gender affect many behaviors and preferences and becomes a variable being tested often.
+
+**Hypothesis 2:** The number of class failures ('failures') associates with alcohol consumption. Students with more class failures have higher alcohol consumption.
+
+
+**Hypothesis 3:** The frequency of going out with friends ('goout') associates with alcohol consumption.  Students going out with friends more often have higher alcohol consumption.
+
+
+**Hypothesis 4:** The number of school absences ('absences') associates with alcohol consumption. Students having more times of school absences have higher alcohol consumption.
+
+## 3.3 Exploring the relationships numerically and graphically
+
+**(Step 4)**
+
+```{r, results='hide', message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+```
+
+### 3.3.1 Alcohol consumption and gender
+
+```{r}
+alc %>% group_by(sex) %>% summarise(count = n()) -> fm
+knitr::kable(fm, caption="Students' gender distribution") %>% kable_styling(bootstrap_options = "hover", full_width = FALSE, position = "center")
+```
+
+There were 198 female students and 184 male students.
+
+```{r}
+ggplot(data = alc, aes(x = alc_use, fill = sex)) + geom_bar() + xlab("Alcohol consumption (1: lowest / 5: highest)") + ylab("Numeber of students") + ggtitle("Alcohol consumption and gender") + scale_fill_discrete("Gender", labels = c("Female", "Male"))
+```
+
+Te figure presents the distribution of alcohol consumption taking gender into account. 1 means the lowest consumption, 5 is the highest consumption.
+
+```{r}
+ggplot(data = alc, aes(x = alc_use, fill = high_use)) + facet_wrap("sex") + geom_bar() + xlab("Student's alcohol consumption") + ggtitle("High alcohol consumption by gender") + ylab("Numeber of students") + scale_fill_discrete("High alcohol use")
+```
+
+This graph shows the number of male and female students with higher alcohol consumption. High alcohol consumption was in red and lower alcohol consumption was in red blue. Male students with high alcohol consumption more than female students with high consumption.
+
+### 3.3.2 Alcohol consumption and number of class failures
+
+```{r}
+ggplot(data = alc, aes(x = failures,  fill = sex)) + geom_bar() + facet_wrap("high_use") + ggtitle("Alcohol consumption and number of class failures") + xlab("Number of class failures") + ylab("Numeber of students") + scale_fill_discrete("Gender", labels = c("Female", "Male"))
+```
+
+
+### 3.3.3 Alcohol consumption and frequency of going out with friends
+
+```{r}
+ggplot(data = alc, aes(x = goout,  fill = sex)) + geom_bar() + facet_wrap("high_use") + ggtitle("Alcohol consumption and frequency of going out with friends") + xlab("Number of going out with friends (1: very low / 5: very high)") + ylab("Numeber of students") + scale_fill_discrete("Gender", labels = c("Female", "Male"))
+```
 
 
 
-### Read the prepared data set
+### 3.3.4 Alcohol consumption and number of school absences
+
+```{r}
+ggplot(data = alc, aes(x = absences,  fill = sex)) + geom_bar() + facet_wrap("high_use") + ggtitle("Alcohol consumption and number of school absences") + xlab("Number of school absences (from 0 to 93)") + ylab("Numeber of students") + scale_fill_discrete("Student's gender", labels = c("Female", "Male"))
+```
 
 
 
+## 3.4 Exploring the relationship using logistic regression
+
+### 3.4.1 The fitted model
+
+**(Step 5a)**
+
+'sex', 'failures','goout' and 'absences'
+
+```{r}
+lr_glm <- glm(high_use ~ sex + failures + goout + absences, data = alc, family = "binomial")
+lr_glm_sum <- summary(lr_glm)
+```
+
+### 3.4.2 The coefficients of the model
+
+**(Step 5b)**
+
+```{r}
+lr_glm_sum
+```
+
+```{r}
+knitr::kable(lr_glm_sum$coefficients, digits = 3, align = "l", justify = "left", caption="Model coefficients of choosen variables") %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+```
+
+**The output shows**
+
+- Being a male student instead of a female student significantly (p < 0.001) increased the probability of high alcohol consumption.
+
+- Class failure had a positive effect on high consumption with a smaller probability (p = 0.095).
+
+- The frenquency of going out with friends had a significant positive effect on high alcohol consumption (p < 0.001).
+
+- School absences had a significant positive effect on high alcohol consumption (< 0.001).
+
+
+### 3.4.3 The odds ratios and confidence intervals
+
+**(Step 5c)**
+
+Odds ratios
+
+```{r}
+or_lr <- coef(lr_glm) %>% exp
+or_lr 
+```
+
+Confidence intervals
+```{r}
+ci_lr <- confint(lr_glm) %>% exp
+ci_lr
+```
+
+Print out the odds ratios with their confidence intervals
+
+```{r}
+od_conf <- cbind(or_lr, ci_lr) 
+colnames(od_conf) <- c("odds ratios","2.5 %", "97.5 %")
+knitr::kable(od_conf, digits = 3, align = "l",  caption="Odds ratios and confidental intervals") %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+```
 
 
 
+- 'sex' has a value of 2.656, the confidence interval is between 1.609 and 4.450.  So this oods ratio tells us that the probability of high alcohol consumption for male students was a 2.7 times higher than female students.
+
+- 'failures' has a value of 1.332, the confidence interval is between 0.950 and 1.868.  Class failures increased the risk of high alcohol consumption.
+
+- 'goout' has a value of 2.045, the confidence interval is between 1.624 and 2.611.  Going out with friends significantly increased the risk of high alcohol consumption.
+
+- 'absences' has a value of 1.068, the confidence interval is between 1.035	 and 1.107. School absences increased the probability of higher alcohol consumption.  
+
+## 3.5 The predictive power of you model
+
+**(Step 6)**
+
+```{r}
+probs <- predict(lr_glm, type = "response")
+alc <- mutate(alc, prob = probs)
+alc <- mutate(alc, pred = prob > 0.5)
+select(alc, age, failures, goout, absences, high_use, prob, pred) %>% tail(20)
+pred22 <- table(high_use = alc$high_use, pred = alc$pred)
+knitr::kable(pred22, align = "l",  caption="2 x 2 cross tabulation" ) %>% kable_styling(bootstrap_options = "striped", full_width = F, position = "center") %>% add_header_above(c(" " = 1, "Pred" = 2)) %>%  pack_rows("High use", 1, 2)
+```
 
 
+The model reported 251 correct false results and 62 false negative results. Among the 62 cases, students had high alcohol consumption but the model predicted not. Among the 19 false positive prediction cases, the model predicted high alcohol consumption but it was not in fact.
 
+```{r}
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+loss_func(class = alc$high_use, prob = alc$prob)
+```
+
+It showed that 21.2% of all predictions was incorrect.
+
+
+## 3.6 The 10-fold cross-validation on the model
+
+**(Step 7)**
+
+```{r}
+library(boot)
+cross_val<- cv.glm(data = alc, cost = loss_func, glmfit = lr_glm, K = 10)
+cross_val$delta[1]
+```
+
+
+## 3.7 cross-validation to compare the performance of different logistic regression models
+
+**(Step 8)**
