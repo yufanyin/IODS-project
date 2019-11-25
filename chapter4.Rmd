@@ -1,0 +1,363 @@
+# Chapter 4: Clustering and classification
+
+(19.11.-25.11.2019)
+ 
+- **Work through the DataCamp**
+
+    DataCamp 5 Clustering and classification
+  
+- **Data source**
+
+    Harrison, D. and Rubinfeld, D.L. (1978) Hedonic prices and the demand for clean air. J. Environ. Economics and Management 5, 81–102.
+    
+    Belsley D.A., Kuh, E. and Welsch, R.E. (1980) Regression Diagnostics. Identifying Influential Data and Sources of Collinearity. New York: Wiley.
+
+
+**Note:** '(Step N)' is used for reviewers to check my work queicky.
+
+
+## 4.1 Reading the data
+
+**Load the Boston data from the MASS package (Step 2a)**
+
+```{r}
+library(MASS)
+data("Boston")
+```
+
+**Print out the names of the variables in the data (Step 2b)**
+```{r}
+dim(Boston)
+colnames(Boston)
+str(Boston)
+```
+
+**Describe the dataset briefly (Step 2c)**
+
+The data consist of 506 observations in 14 variables. Information about housing (proportion of residential land, proportion of non-retail business, rooms per dwelling, proportion of old buildings, accessibility to employment centres and highways), population (crime rate, tax, pupil-teacher ratio, demographic structure), environment (air quality, river) in Boston suburbs were reported.
+
+This data frame contains the following columns:
+
+- "crim": per capita crime rate by town.
+
+- "zn": proportion of residential land zoned for lots over 25,000 sq.ft.
+
+- "indus": proportion of non-retail business acres per town.
+
+- "chas": Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
+
+- "nox": nitrogen oxides concentration (parts per 10 million).
+
+- "rm": average number of rooms per dwelling.
+
+- "age": proportion of owner-occupied units built prior to 1940.
+
+- "dis": weighted mean of distances to five Boston employment centres.
+
+- "rad": index of accessibility to radial highways.
+
+- "tax": full-value property-tax rate per \$10,000.
+
+- "ptratio": pupil-teacher ratio by town.
+
+- "black": 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
+
+- "lstat": lower status of the population (percent).
+
+- "medv": median value of owner-occupied homes in \$1000s.
+
+## 4.2 Exploring the data numerically and graphically
+
+### 4.2.1 A graphical overview of the data
+**(Step 3a)**
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+library(corrplot)
+library(ggplot2)
+library(GGally)
+ov_boston <- ggpairs(Boston, mapping = aes(), title ="Overview of Boston data", lower = list(combo = wrap("facethist", bins = 20)), upper = list(continuous = wrap("cor", size = 2.8)))
+ov_boston
+```
+
+### 4.2.2 Summaries of the variables
+**(Step 3b)**
+
+```{r}
+summary(Boston)
+```
+
+### 4.2.3 Relationships between the variables
+**(Step 3c)**
+
+Calculate and print the correlation matrix
+```{r}
+cor_matrix<-cor(Boston) %>% round(digits = 2)
+cor_matrix
+```
+
+Specialized according to the significant level and visualize the correlation matrix
+p.mat <- cor.mtest(cor_matrix)$p
+
+
+
+```{r}
+library(corrplot)
+p.mat <- cor.mtest(cor_matrix)$p
+corrplot(cor_matrix, method="circle", type="upper",  tl.cex = 0.6, p.mat = p.mat, sig.level = 0.01, title="Correlations of Boston data", mar=c(0,0,1,0))
+```
+
+**The crime rate strongly positively correlated with accessibility to highways, the property-tax rate and with the lower status.**
+
+The nitrogen oxides concentration significantly correlated with The weighted mean of distances to five employment significantly positively correlated with  proportion of big residential land zoned and negatively correlated with proportion of non-retail business acres, proportion of old owner-occupied units and nitrogen oxides concentration.
+
+## 4.3 Standardize the dataset
+
+### 4.3.1 Standardize and print out summaries of the scaled data
+**(Step 4a)**
+
+Values were standardized after data scaling so that the observations of the different variables can be compared with each other. Positive and negative values were created with an overall mean of 0 and a standard deviation of 1.
+
+```{r}
+bos_scaled <- scale(Boston)
+summary(bos_scaled)
+```
+
+### 4.3.2 Create a categorical variable of the crime rate
+**(Step 4b)**
+
+Create a quantile vector of crim
+
+```{r}
+class(bos_scaled)
+bos_scaled <- as.data.frame(bos_scaled)
+summary(bos_scaled$crim)
+bins <- quantile(bos_scaled$crim)
+bins
+```
+
+Create a categorical variable 'crime' and look at the table
+
+```{r}
+crime <- cut(bos_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
+table(crime)
+```
+
+remove original crim and add the new categorical value to scaled data
+
+```{r}
+bos_scaled <- dplyr::select(bos_scaled, -crim)
+bos_scaled <- data.frame(bos_scaled, crime)
+```
+
+We checked the scaled values of rate values and defined the quantiles. Then we named them as low (0-25%), medium low (25-50%), medium high(50-75%) and high (75-100%).Then the quantiles of crime rate quantiles 'crime' were added and replaced 'crim'.
+
+### 4.3.3 Divide the dataset to train and test sets
+**(Step 4c)**
+
+Choose randomly 80% of the rows and create the train set and the test set
+
+```{r}
+n_bos <- nrow(bos_scaled)
+ind_bos <- sample(n_bos,  size = n_bos * 0.8)
+boston_train <- bos_scaled[ind_bos,]
+boston_test <- bos_scaled[-ind_bos,]
+```
+
+Save the correct classes from test data
+
+```{r}
+correct_classes <- boston_test$crime
+correct_classes
+```
+
+Remove the crime variable from test data set
+
+```{r}
+boston_test <- dplyr::select(boston_test, -crime)
+```
+
+## 4.4 Linear discriminant analysis
+
+**(Step 5)**
+
+Fit linear discriminant analysis on the ‘boston_train’ data set using the categorical 'crime' as the target variable.
+
+```{r}
+lda.fit <- lda(crime ~ ., data = boston_train)
+lda.fit
+```
+
+The function for lda biplot arrows
+
+```{r}
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "orange", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+```
+
+Target classes as numeric and plot the lda results
+
+```{r}
+classes <- as.numeric(boston_train$crime)
+plot(lda.fit, dimen = 2, col = classes, pch = classes, main = "LDA biplot of Boston train set")
+```
+
+The linear discriminant analysis showed the separation of different crime rates.
+
+**Note: I do not know why the arrow were not desplayed.**
+
+**Error in arrows(x0 = 0, y0 = 0, x1 = myscale * heads[, choices[1]], y1 = myscale * : plot.new has not been called yet**
+
+## 4.5 Predict the classes with the LDA model
+
+Now we Use the LDA outcome to perform a prediction on the crime rate on the test set.
+
+### 4.5.1 Predict classes with test data
+**(Step 6a)**
+
+```{r}
+lda.pred <- predict(lda.fit, newdata = boston_test)
+```
+
+### 4.5.2 Cross tabulate the results with the crime categories
+**(Step 6b)**
+
+```{r}
+pred_table <- table(correct = correct_classes, predicted = lda.pred$class)
+pred_table
+```
+
+The results were not very good on lower crime rate predictions. The predicted crime rate was higher than it actually was: predicted med_low of and med_high which were low rates or med_low rates. However, the predictions on the high crime rates was good.
+
+## 4.6 Reload the dataset and run k-means algorithm
+
+In 4.5, we performed classification.In classification, the classes are defined before (crime rate values from low to high) and the classification model is trained based on data.
+
+Now we do Clustering. The classes / number of classes is unknown and we will find groups based on similarity of the observations.  
+
+### 4.6.1 Standardize the Boston dataset
+**(Step 7a)**
+
+```{r}
+data(Boston)
+bos_scaled2 <- scale(Boston)
+
+```
+
+### 4.6.2 Calculate the distances
+**(Step 7b)**
+
+Euclidean distance matrix
+
+```{r}
+dist_eu <- dist(bos_scaled2)
+summary(dist_eu)
+```
+
+Manhattan distance matrix
+
+```{r}
+dist_man <- dist(bos_scaled2, method = "manhattan")
+summary(dist_man)
+```
+
+### 4.6.3 k-means clustering
+**(Step 7c)**
+
+```{r}
+bos_km <- kmeans(bos_scaled2, centers = 3)
+```
+
+Plot the dataset with clusters
+
+```{r}
+pairs(bos_scaled2, col = bos_km$cluster)
+pairs(bos_scaled2[,1:5], col = bos_km$cluster)
+pairs(bos_scaled2[,6:10], col = bos_km$cluster)
+pairs(bos_scaled2[,11:14], col = bos_km$cluster)
+```
+
+The optimal number of clusters was 3. We got the best overview with three clusters.
+
+### 4.6.4 Determine the k
+
+```{r}
+set.seed(123)
+k_max <- 10 # determine the number of clusters
+twcss <- sapply(1:k_max, function(k){kmeans(bos_scaled2, k)$tot.withinss}) # calculate the total within sum of squares
+qplot(x = 1:k_max, y = twcss, geom = 'line') # visualize the results
+```
+
+```{r}
+bos_km2 <- kmeans(bos_scaled2, centers = 3) # k-means clustering
+pairs(bos_scaled2, col = bos_km2$cluster) # plot the data with clusters
+pairs(bos_scaled2[,1:5], col = bos_km2$cluster)
+pairs(bos_scaled2[,6:10], col = bos_km2$cluster)
+pairs(bos_scaled2[,11:14], col = bos_km2$cluster)
+```
+
+The twcss value decrease heavily at a level of 2 - 3 clusters. The optimal number of clusters was 3.
+
+## 4.7 Perform k-means on the original data
+
+**(Bonus)**
+
+```{r}
+data(Boston)
+bos_scaled3 <- scale(Boston)
+bos_km3 <-kmeans(bos_scaled3, centers = 3)
+cluster <- bos_km3$cluster
+bos_scaled3 <- data.frame(bos_scaled3, cluster)
+lda.fit_cluster <- lda(cluster ~ ., data = bos_scaled3)
+lda.fit_cluster
+```
+
+```{r}
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "orange", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+```
+
+```{r}
+classes3 <- as.numeric(bos_scaled3$cluster)
+plot(lda.fit_cluster, dimen = 2, col = classes3, pch = classes3, main = "LDA biplot using three clusters")
+lda.arrows(lda.fit_cluster, myscale = 2)
+```
+
+## 4.8 3D plot
+
+**(Super-Bonus)**
+
+```{r}
+model_predictors <- dplyr::select(boston_train, -crime)
+# check the dimensions
+dim(model_predictors)
+dim(lda.fit$scaling)
+# matrix multiplication
+matrix_product <- as.matrix(model_predictors) %*% lda.fit$scaling
+matrix_product <- as.data.frame(matrix_product)
+```
+
+Next, install and access the plotly package. 
+Create a 3D plot of the columns of the matrix product.
+
+**Note:** After running:
+
+**plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers', color = boston_train$crime)**
+
+It showed:
+
+WebGL is not supported by your browser. Therefore I cannot see a cool plot.
+
