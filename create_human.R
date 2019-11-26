@@ -33,7 +33,6 @@ summary(gii)
 # 5.1.3 Rename the variables with (shorter) descriptive names
 # [Step 4]
 
-  
 # The data 'hd'consists of 195 observations in 8 variables.
 
 # HDI.Rank: rank1
@@ -45,25 +44,27 @@ summary(gii)
 # Gross.National.Income..GNI..per.Capita: gni1
 # GNI.per.Capita.Rank.Minus.HDI.Rank: d
 
+library(dplyr)
+
+head(hd)
+
+hd <- rename(hd,rank1 = HDI.Rank)
+hd <- rename(hd,hd = Human.Development.Index..HDI.)
+hd <- rename(hd,lifex = Life.Expectancy.at.Birth)
+hd <- rename(hd,eyedu = Expected.Years.of.Education)
+hd <- rename(hd,myedu = Mean.Years.of.Education)
+hd <- rename(hd,gni = Gross.National.Income..GNI..per.Capita)
+hd <- rename(hd,gni_hdi = GNI.per.Capita.Rank.Minus.HDI.Rank)
+
+head(hd)
+
 # The data 'gii'consists of 195 observations in 10 variables.
-
-# GII.Rank: rank2
-# Country: ctr2
-# Gender.Inequality.Index..GII.: gii
-# Maternal.Mortality.Ratio: mmr
-# Adolescent.Birth.Rate: abr
-# Percent.Representation.in.Parliament: repar
-# Population.with.Secondary.Education..Female.: edu2F
-# Population.with.Secondary.Education..Male.: edu2M
-# Labour.Force.Participation.Rate..Female.: labF
-# Labour.Force.Participation.Rate..Male.: labF
-
-head(gii)
 
 library(dplyr)
 
+head(gii)
+
 gii <- rename(gii, rank2 = GII.Rank)
-gii <- rename(gii, ctr2 = Country)
 gii <- rename(gii, gii = Gender.Inequality.Index..GII.)
 gii <- rename(gii, mmr = Maternal.Mortality.Ratio)
 gii <- rename(gii, abr = Adolescent.Birth.Rate)
@@ -75,7 +76,6 @@ gii <- rename(gii, labM = Labour.Force.Participation.Rate..Male.)
 
 head(gii)
 
-
 # 5.1.4 Mutate the ¡°Gender inequality¡± data and create two new variables
 # [Step 5]
 
@@ -84,5 +84,16 @@ gii <- mutate(gii, edu2F_edu2M = edu2F/edu2M)
 
 gii <- mutate(gii, labF_labM = labF/labM)
 
+head(gii)
 
+# 5.1.5 Join the two datasets together
 
+# [Step 6]
+
+join = c("Country")
+
+human <- inner_join(hd, gii, by = join, suffix = c(".hd", ".gii")) 
+
+str(human)
+
+write.table(human, file = "G:/C-Open Data Science/0-191030/IODS-project-master/human")
