@@ -1,0 +1,15 @@
+# Chapter 5: Dimensionality reduction techniques
+
+(25.11.-2.12.2019)
+
+
+- **Data wrangling**
+
+    R script of data Wrangling exercise is available here.
+     
+    https://github.com/yufanyin/IODS-project/blob/master/create_human.R
+    
+## 5.1
+
+
+## 5.2
