@@ -121,7 +121,7 @@ head(human)
 str(human)
 summary(human)
 
-# The data is the conbination of two data sets, Human Development Index (HDI) and Gender Inequality Index.
+# The data are the conbination of two data sets, Human Development Index (HDI) and Gender Inequality Index.
 
 # The data consist of 195 observations in 19 variables.
 
