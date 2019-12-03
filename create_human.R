@@ -192,7 +192,7 @@ tail(human_ana, 10)
 # [Step 5]
 
 # Add countries as row names
-rownames(human_ana) <- human_ana$country
+rownames(human_ana) <- human_ana$Country
 
 head(human_ana)
 

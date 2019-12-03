@@ -1,0 +1,14 @@
+# Chapter 6: Analysis of longitudinal data
+
+(3.12.-9.12.2019)
+
+- **Data wrangling**
+
+    R script of data Wrangling exercise is available here.
+     
+    http
+    
+## 6.1 
+
+
+## 6.2
