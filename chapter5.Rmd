@@ -185,12 +185,52 @@ str(tea)
 ### 5.4.2 Visualization of 'tea' data
 **(Step 5b)**
 
+**Error in the following chunk:**
 
+Warning: attributes are not identical across measure variables;
+
+they will be dropped
+
+**WHY?**
+The error occurred in knitting index.rmd. Everything was fine when I knitted chapter5.rmd
+
+I had to add #### so that all the following codes would be able to display without running.
+
+
+```{r}
+# column names to keep in the dataset
+#### keep_tea <- c("Tea", "How", "how", "price", "where", "lunch")
+#### keep_tea
+
+# select and create a new dataset
+#### tea_time <- select(tea, one_of(keep_tea))
+
+#### gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkblue") + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+```
 
 ### 5.4.3 Multiple Correspondence Analysis and its summary
 **(Step 5c)**
 
+```{r}
+#### mca_tea_time <- MCA(tea_time, graph = FALSE)
+#### summary(mca_tea_time)
+```
+
 Visualize MCA
+
+```{r}
+#### plot(mca_tea_time, invisible=c("ind"), habillage = "quali")
+```
+
+### 5.4.4 MCA biplot of tea consumption behaviour
+**(Step 5d)**
+
+An individual value between 0 & 1 was added to colour the cosine-squared (cos2), a value between 0 & 1. The closer to 1, the better this value projected on the dimension.
+
+```{r}
+#### fviz_mca_biplot(mca_tea_time, col.ind = "cos2", col.var = "darkred", label = "var", geom =  c("point","text"), labelsize = 4, arrows = c(FALSE,TRUE)) + labs(title = "MCA of tea consumption behaviour") + theme_grey() + theme(axis.line = element_line(size = 0.5), panel.background = element_rect(fill = "gray93"))
+```
+
 
 
 ### 5.4.4 MCA biplot of tea consumption behaviour
@@ -208,26 +248,162 @@ An individual value between 0 & 1 was added to colour the cosine-squared (cos2),
 "slimming": To lose weight or not
 "relaxing": Relaxation or not
 
-```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
-# column names to keep
-reason_select <- c("sex", "age_Q", "spirituality", "healthy", "slimming", "relaxing")
+**(Same error in this chunk)**
 
-# create a new dataset
-tea_reason <- select(tea, one_of(reason_select))
+```{r}
+#### keep_reason <- c("sex", "age_Q", "spirituality", "healthy", "slimming", "relaxing")
+#### tea_reason <- select(tea, one_of(keep_reason))
 
-gather(tea_reason) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkblue", alpha = 0.6) + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+#### gather(tea_reason) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkblue", alpha = 0.6) + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
 ```
 
 MCA of 'tea_reason' data
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
-mca_tea_reason <- MCA(tea_reason, graph = FALSE)
-summary(mca_tea_reason)
+#### mca_tea_reason <- MCA(tea_reason, graph = FALSE)
+#### summary(mca_tea_reason)
 ```
+
+
+Call:
+MCA(X = tea_reason, graph = FALSE) 
+
+
+Eigenvalues
+
+                       Dim.1   Dim.2   Dim.3   Dim.4   Dim.5   Dim.6
+                       
+Variance               0.233   0.217   0.202   0.173   0.166   0.138
+
+% of var.             15.562  14.476  13.456  11.502  11.066   9.187
+
+Cumulative % of var.  15.562  30.039  43.495  54.997  66.063  75.251
+
+                       Dim.7   Dim.8   Dim.9
+                       
+Variance               0.132   0.126   0.113
+
+% of var.              8.833   8.393   7.523
+
+Cumulative % of var.  84.083  92.477 100.000
+
+
+Individuals (the 10 first)
+
+                    Dim.1    ctr   cos2    Dim.2    ctr   cos2    Dim.3
+                    
+1                |  0.491  0.344  0.135 |  0.199  0.061  0.022 |  0.110
+
+2                |  0.506  0.366  0.210 |  0.599  0.551  0.294 | -0.564
+
+3                |  0.039  0.002  0.001 |  0.353  0.191  0.119 | -0.380
+
+4                | -0.602  0.518  0.306 | -0.531  0.432  0.237 |  0.178
+
+5                |  0.208  0.062  0.024 | -0.446  0.305  0.112 | -0.116
+
+6                | -0.270  0.104  0.081 | -0.288  0.128  0.093 |  0.198
+
+7                |  0.024  0.001  0.000 | -0.047  0.003  0.001 |  0.294
+
+8                | -0.193  0.053  0.025 |  0.146  0.033  0.014 | -0.211
+
+9                |  0.308  0.135  0.049 | -0.410  0.259  0.088 |  0.073
+
+10               |  0.024  0.001  0.000 | -0.047  0.003  0.001 |  0.294
+
+
+                    ctr   cos2  
+                    
+1                 0.020  0.007 |
+
+2                 0.526  0.261 |
+
+3                 0.239  0.138 |
+
+4                 0.052  0.027 |
+
+5                 0.022  0.008 |
+
+6                 0.065  0.044 |
+
+7                 0.143  0.054 |
+
+8                 0.074  0.030 |
+
+9                 0.009  0.003 |
+
+10                0.143  0.054 |
+
+
+Categories (the 10 first)
+
+                     Dim.1     ctr    cos2  v.test     Dim.2     ctr
+                     
+F                |  -0.256   2.767   0.095  -5.338 |   0.220   2.198
+
+M                |   0.373   4.037   0.095   5.338 |  -0.321   3.208
+
+15-24            |  -0.834  15.237   0.308  -9.593 |  -0.524   6.472
+
+25-34            |   0.681   7.619   0.139   6.437 |  -0.744   9.760
+
+35-44            |   0.018   0.003   0.000   0.121 |   0.149   0.229
+
+45-59            |   0.692   6.948   0.122   6.043 |   0.728   8.276
+
++60              |  -0.346   1.086   0.017  -2.282 |   1.293  16.262
+
+Not.spirituality |   0.302   4.458   0.199   7.719 |   0.212   2.374
+
+spirituality     |  -0.661   9.770   0.199  -7.719 |  -0.465   5.203
+
+healthy          |  -0.247   3.050   0.142  -6.525 |   0.304   4.981
+
+
+                    cos2  v.test     Dim.3     ctr    cos2  v.test  
+                    
+F                  0.070   4.589 |  -0.555  15.066   0.449 -11.582 |
+
+M                  0.070  -4.589 |   0.809  21.981   0.449  11.582 |
+
+15-24              0.122  -6.030 |  -0.522   6.893   0.120  -6.000 |
+
+25-34              0.165  -7.027 |   0.983  18.367   0.289   9.294 |
+
+35-44              0.003   1.014 |  -0.261   0.750   0.010  -1.770 |
+
+45-59              0.135   6.361 |  -0.716   8.605   0.131  -6.254 |
+
++60                0.243   8.517 |   0.901   8.498   0.118   5.936 |
+
+Not.spirituality   0.099   5.433 |   0.017   0.016   0.001   0.432 |
+
+spirituality       0.099  -5.433 |  -0.037   0.035   0.001  -0.432 |
+
+healthy            0.216   8.043 |   0.179   1.853   0.075   4.730 |
+
+
+Categorical variables (eta2)
+
+                   Dim.1 Dim.2 Dim.3  
+sex              | 0.095 0.070 0.449 |
+
+age_Q            | 0.433 0.534 0.522 |
+
+spirituality     | 0.199 0.099 0.001 |
+
+healthy          | 0.142 0.216 0.075 |
+
+slimming         | 0.100 0.272 0.107 |
+
+relaxing         | 0.431 0.111 0.058 |
+
+
 
 MCA biplot of 'tea_reason' data
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
-fviz_mca_biplot(mca_tea_reason, col.ind = "cos2", col.var = "darkred", alpha.var = "contrib", label = "var", geom =  c("point","text"), labelsize = 3.5, arrows = c(FALSE,TRUE)) + labs(title = "MCA of tea consumption reasons") + theme_grey() + theme(axis.line = element_line(size = 0.5), panel.background = element_rect(fill = "gray93"))
+#### fviz_mca_biplot(mca_tea_reason, col.ind = "cos2", col.var = "darkred", alpha.var = "contrib", label = "var", geom =  c("point","text"), labelsize = 3.5, arrows = c(FALSE,TRUE)) + labs(title = "MCA of tea consumption reasons") + theme_grey() + theme(axis.line = element_line(size = 0.5), panel.background = element_rect(fill = "gray93"))
 ```
 
 Comment on the output
