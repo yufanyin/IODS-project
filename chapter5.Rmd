@@ -81,7 +81,7 @@ Expected years of education strongly positively correlated with Live expectation
 
 Another strong positive correlation was seen between adolescent birth rate and maternal mortality ratio. This may be due to high quality of medical care. 
 
-## 5.2 Principal component analysis (PCA) on unstandardized data
+## 5.2 Principal component analysis (PCA) on non-standardized data
 
 In PCA, the data are first transformed to a new space with equal or less number of dimensions which called the principal components. The 1st principal component captures the maximum amount of variance from the features in the original data. The 2nd principal component is orthogonal to the first and it captures the maximum amount of variability left.
 
@@ -107,15 +107,15 @@ The biplot displayed the observations by the first two principal components (PC1
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 pca_label1 <-  paste0("GNI (", pca_prc1[1],"%)" )
 pca_label2 <-  paste0("Maternal mortality (", pca_prc1[2],"%)" )
-biplot(pca_human, choices = 1:2, cex = c(0.55, 0,9), col = c("grey40", "darkgreen"), xlab = pca_label1, ylab = pca_label2, main = "PCA biplot of unstandardized human data", margin =c(0,0,5,0)) 
+biplot(pca_human, choices = 1:2, cex = c(0.55, 0,9), col = c("grey40", "darkgreen"), xlab = pca_label1, ylab = pca_label2, main = "PCA biplot of non-standardized human data", margin =c(0,0,5,0)) 
 ```
 
 
 ```{r}
-autoplot(pca_human, data = human, label= TRUE, label.size = 3.0, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "red",) + ggtitle("PCA biplot of unstandardized human data 2") + xlab(paste0(pca_label1))  + ylab(paste0(pca_label2)) + theme_bw()
+autoplot(pca_human, data = human, label= TRUE, label.size = 3.0, colour = "darkgreen", loadings = TRUE, loadings.label = TRUE, loadings.colour = "red",) + ggtitle("PCA biplot of non-standardized human data 2") + xlab(paste0(pca_label1))  + ylab(paste0(pca_label2)) + theme_bw()
 ```
 
-Principal component 1 (GNI) represents 99.99% of the variance of the unstandardized data. PC2 (maternal mortalility ratio) captures 0.01% of the variance. The Gross National Income per capita explains 99.99% of the principal component 1 of the data.
+Principal component 1 (GNI) represents 99.99% of the variance of the non-standardized data. PC2 (maternal mortalility ratio) captures 0.01% of the variance. The Gross National Income per capita explains 99.99% of the principal component 1 of the data.
 
 ## 5.3 Principal component analysis (PCA) on standardized data
 
@@ -159,19 +159,86 @@ biplot(pca_stzd_human, choices = 1:2, cex = c(0.5, 0,9), col = c("grey40", "deep
 autoplot(prcomp(stzd_human), data = human, colour = "darkgreen", label= TRUE, label.size = 3.0, loadings = TRUE, loadings.label = TRUE, loadings.colour = "red",) + ggtitle("PCA biplot of standardized 'human' data 2") + xlab(paste0(pca_label2.1))  + ylab(paste0(pca_label2.2)) + theme_bw()
 ```
 
+### 5.3.4 Interpretations of the first two principal component dimensions
+**(Step 4)**
+
+The principal component representing 16.2% of the data variation was strongly associated with percentage of parliament representatives ("F_parli") and ratio of labour forced female/male ("labF_labM"). So the share of of woman in labour market and in the political representatives were mostly associated with principal component 2. The variables which showed the strongest association with principal component 1 and represented 53.6% of the data variation were life expectancy ("exp_life"), expected years of education ("exp_edu"), the ratio of second education of female/male ("edu2F_edu2M"), adolescent birth rate ("ado_birth") and maternal mortality ratio ("mat_mor"). Hence principal component 1 discribed the health and education situation in those countries.
+
+The PCA result on between non-standardized data differed from that on standardized data. In the PCA of the non-standardized human data, the principal component 1 represents almost all varation and Gross National Income per capita is the value representing principle component 1. The PCA of standardized values looks quite different. The PC1 & PC2 values spread all over the biplot and more variables are associated to these two principal components. To perform the PCA, it is necessary to standardizing variables of obsvervations so that values become comparable. **(Before doing this exercise, I did not know why I needed to standardize first! Now I understand.)** 
+
+The angle between the arrows represents the original features of the data and can be interpreted as the correlation between these features. Small angle between the arrows means that the correlation is positive. The angle between the feature and the principal component can be interpreted as the correlation between these two components. Similarly, if the angle is small there is a positive correlation. The length of the arrows is proportional to the standard deviation of the features.
+
+## 5.4 Multiple Correspondence Analysis (MCA)
+
+### 5.4.1 Structure and dimensions of 'tea' data
+**(Step 5a)**
+
+The tea data about tea consumption behaviour were loaded from the package Factominer. The data consist of 300 observations in 36 variables.
+
+```{r}
+library(FactoMineR)
+data(tea)
+dim(tea)
+str(tea)
+```
+
+### 5.4.2 Visualization of 'tea' data
+**(Step 5b)**
 
 
 
+### 5.4.3 Multiple Correspondence Analysis and its summary
+**(Step 5c)**
+
+Visualize MCA
 
 
+### 5.4.4 MCA biplot of tea consumption behaviour
+**(Step 5d)**
 
+An individual value between 0 & 1 was added to colour the cosine-squared (cos2), a value between 0 & 1. The closer to 1, the better this value projected on the dimension.
 
+### 5.4.5 MCA of reason for drinking tea
+**(Step 5e)**
 
+"sex": Gender of tea consumers
+"age_Q": Age group of tea consumers
+"spirituality": Spiritual reason
+"healthy": Health reason
+"slimming": To lose weight or not
+"relaxing": Relaxation or not
 
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# column names to keep
+reason_select <- c("sex", "age_Q", "spirituality", "healthy", "slimming", "relaxing")
 
+# create a new dataset
+tea_reason <- select(tea, one_of(reason_select))
 
+gather(tea_reason) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar(fill = "darkblue", alpha = 0.6) + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+```
 
+MCA of 'tea_reason' data
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+mca_tea_reason <- MCA(tea_reason, graph = FALSE)
+summary(mca_tea_reason)
+```
 
+MCA biplot of 'tea_reason' data
 
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+fviz_mca_biplot(mca_tea_reason, col.ind = "cos2", col.var = "darkred", alpha.var = "contrib", label = "var", geom =  c("point","text"), labelsize = 3.5, arrows = c(FALSE,TRUE)) + labs(title = "MCA of tea consumption reasons") + theme_grey() + theme(axis.line = element_line(size = 0.5), panel.background = element_rect(fill = "gray93"))
+```
 
+Comment on the output
 
+**(Step 5f)**
+
+Variable categories closing to each other showed higher similarity. The plot included two colour schemes representing the contribution of the variables to the dimenstions(“contrib”) and the “cos2” of the individuals (the closer to 1, the better it projected on the dimension) . 
+
+People in the age of 15-24, spirituality and relaxation reason were close.
+Men in the age of 25-34 tended not to drink tea for health reason or losing weight.
+People in the age of 45-59 tended not to drink tea for relaxation or spirituality reason.
+People in age of 60+ and women group have similarities with drinking tea for health reasons and weight losing.
+
+**Note:** PCA and MCA biplot help to visualize results much better than doing in SPSS. Wrting codes in R is a bit more abstract but it is worth learning.
