@@ -37,13 +37,25 @@ Load the wide (bprs & rats) and long (bprs_l & rats_l) data sets
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 bprs <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/BPRS.txt", sep = " ", header = TRUE)
-rats <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/rats.txt", stringsAsFactors = F)
+rats <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/rats.txt", header = TRUE)
 bprs_l <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/BPRS_l.txt")
 rats_l <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/rats_l.txt")
 ```
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
 str(bprs_l) 
+str(rats_l)
+```
+
+bprs data: factor treatment & subject
+rats data: factor ID & Group
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+bprs_l$treatment <- factor(bprs_l$treatment)
+bprs_l$subject <- factor(bprs_l$subject)
+rats_l$ID <- factor(rats_l$ID)
+rats_l$Group <- factor(rats_l$Group)
+str(bprs_l)
 str(rats_l)
 ```
 
@@ -91,11 +103,117 @@ knitr::kable(rats_l, caption = "The long RATS data 'rats_l'") %>%
 
 Analyses of chapter 8 of MABS using the RATS data (rats_l)
 
+### 6.2.1 Exploring the data graphically
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(rats_l, aes(x = Time, y = Weight,linetype = ID)) +
+  geom_line(color = "darkblue") +
+  scale_linetype_manual(values = rep(1:6, times= 3)) + 
+  facet_grid(. ~ Group, labeller = label_both) +
+  theme(legend.position = "right") +
+  scale_y_continuous(limits = c(min(rats_l$Weight), max(rats_l$Weight))) + 
+ ggtitle("The long RATS data 'rats_l'")
+```
 
 
 
+Rat’s starting weights in group 2 & 3 were higher than in group 1 and the weights in group 2 & 3 increased in quite high rates. The weights in group 1 increased in a smaller rate.
 
 
+
+### 6.2.2 Standardizing the dataset
+
+Calculating StdWeight and added as a new variable to the 'rats_l'
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_l <- rats_l %>%
+  group_by(Time) %>%
+  mutate(StdWeight = ((Weight - mean(Weight))/sd(Weight))) %>%
+  ungroup()
+str(rats_l)
+```
+
+Plot the standardised data
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(rats_l, aes(x = Time, y = StdWeight, linetype = ID)) +
+  geom_line(color = "darkred") +
+  scale_linetype_manual(values = rep(1:6, times=3)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  scale_y_continuous(name = "StdWeight: standardized Weight values") +
+  ggtitle("Standardized 'rats_l' Weight values") + 
+  theme(panel.grid.major.y = element_line(colour = "darkred"))
+```
+
+
+### 6.2.3 Mean profiles
+
+Add the Time as a categorical variable "Time1"
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_l <- rats_l %>%
+  mutate(Time1 = factor(rats_l$Time)) %>%
+  ungroup()
+str(rats_l)
+```
+
+The overview of rats' weights over the whole measurement period with boxplots. Different diet groups were in different colors.
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(data = rats_l, aes(x = rats_l$Time1, y = Weight, fill = rats_l$Group)) +
+  geom_boxplot() +
+  ylab("Weight") + 
+  xlab("Measurement time [days]") +
+  ggtitle("Rat weights") +
+  scale_fill_discrete(name = "Diet group") +
+  theme(legend.position = "right") 
+```
+
+Calculate mean weight of all rats & the standard error of each diet group and add as a variable
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+n_rats <- rats_l$Time %>% unique() %>% length()
+rats_s <- rats_l %>%
+  group_by(Group, Time) %>%
+  summarise(mean = mean(Weight), se = (sd(Weight)/sqrt(n_rats))) %>%
+  ungroup()
+str(rats_s)
+```
+
+Plot the mean profiles
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(rats_s, aes(x = Time, y = mean, linetype = Group,  color = Group, shape = Group)) +
+  geom_line(size = 0.6) +
+  scale_linetype_manual(name = "Diet group", values = c(1,2,3)) +
+  geom_point(size=1.5) +
+  scale_shape_manual(name = "Diet group", values = c(16,17,18)) +
+  scale_color_manual(name = "Diet group", values = c("darkblue", "darkred", "darkgreen")) +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se, linetype="1"), width=0.8) +
+  theme(legend.position = "right") +
+  scale_y_continuous(name = "Mean (Weight) +/- SE (Weight)") + 
+  ggtitle("Mean weight profiles of different diet groups")
+```
+
+This graph showed the rat weight development of different diet groups during the measurement period. Group 1 started at a lower level and the weight increased slightly . In Group 2 and group 3, weights started from a higher values and then decreased. The standard errors in group 2 & 3 were higher, which indicated that the weight difference between the individual rats was bigger within the diet group.
+
+### 6.2.4 Finding the outlier
+
+Calculating the mean value of weight per diet group
+
+Create a summary data by Group and ID with mean as the summary variable
+
+```{r, rats5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_l10s <- rats_l %>%
+  filter(Time > 1) %>%
+  group_by(Group, ID) %>%
+  summarise(mean=mean(Weight)) %>%
+  ungroup()
+str(rats_l10s)
+```
+
+
+ 
 
 ## 6.3 Linear mixed effects models for normal response variables
 
