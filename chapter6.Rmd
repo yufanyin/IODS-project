@@ -6,9 +6,101 @@
 
     R script of data Wrangling exercise is available here.
      
-    http
+    https://github.com/yufanyin/IODS-project/blob/master/create_BPRS_rats_l.R
     
-## 6.1 
+- **Reference to the data source**
+    
+    https://raw.githubusercontent.com/KimmoVehkalahti/MABS/master/Examples/data/BPRS.txt
+    
+    https://raw.githubusercontent.com/KimmoVehkalahti/MABS/master/Examples/data/rats.txt
+
+    
+## 6.1 Load the wide and long data sets
+
+Load and check the data sets
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# load necessary packages
+library(tidyr)
+library(dplyr)
+library(corrplot)
+library(ggplot2)
+library(GGally)
+library(knitr)
+library(kableExtra)
+library(ggthemes)
+library(stringr)
+library(lme4)
+```
+
+Load the wide (bprs & rats) and long (bprs_l & rats_l) data sets
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+bprs <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/BPRS.txt", sep = " ", header = TRUE)
+rats <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/rats.txt", stringsAsFactors = F)
+bprs_l <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/BPRS_l.txt")
+rats_l <- read.table("G:/C-Open Data Science/0-191030/IODS-project-master/rats_l.txt")
+```
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+str(bprs_l) 
+str(rats_l)
+```
 
 
-## 6.2
+The BPRS data set
+
+A total 40 male subjects were measured with 2 treatment groups using BPRS (Brief Psychiatric Rating Scale). One BPRS measurement was conducted before treatment started (week0), and weekly measurements followed up to 8 weeks. The BPRS assesses the levels of 18 symptom constructs to evaluate whether patients have schizophrenia  (Vehkalahti & Everitt, 2019). The levels of symptoms constructs were from 1 (not present) to 7 (extremely severe).
+
+The long BPRS data 'bprs_l' 
+
+They consisted of 360 observations in 5 variables. The variables included:  
+"treatment": the psychological treatment of the male subjects (1 & 2)  
+"subject": the male individuals identification number
+"weeks":  the week of treatment and BPRS evaluation
+"bprs": the values of bprs
+"week": the week number of the BPRS evaluation.
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+knitr::kable(bprs_l, caption = "The long BPRS data 'bprs_l'") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
+  scroll_box(height = "200px")
+```  
+
+
+The RATS data set
+The data consisted of measurements on how rats grew. Three groups of rats got different diets. The body weight of every animal was measured over a period of 9 weeks. The research question is whether the growth profiles of the different diet groups differ (Vehkalahti & Everitt, 2019). 
+
+The long RATS data 'rats_l' 
+The data consisted of 176 observations in 5 variables. The variables included:
+
+"ID": the individual rat's identification number
+"Group": the diet group (1, 2 & 3)
+"WD": the factorial value of the time (the date when rat' weight was measured)
+"Weight": weight of individual rat at the given day
+"Time": the time point of the weight measurement (days)
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE}
+# rats_ data set
+knitr::kable(rats_l, caption = "The long RATS data 'rats_l'") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% 
+  scroll_box(height = "200px")
+```
+
+## 6.2 Graphical displays and summary measure approach
+
+Analyses of chapter 8 of MABS using the RATS data (rats_l)
+
+
+
+
+
+
+
+## 6.3 Linear mixed effects models for normal response variables
+
+Analyses of chapter 9 of MABS using the BPRS data (bprs_l)
+
+
+(unfinished, see later)
+
