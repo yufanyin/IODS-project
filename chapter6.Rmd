@@ -203,7 +203,7 @@ Calculating the mean value of weight per diet group
 
 Create a summary data by Group and ID with mean as the summary variable
 
-```{r, rats5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 rats_l10s <- rats_l %>%
   filter(Time > 1) %>%
   group_by(Group, ID) %>%
@@ -212,8 +212,109 @@ rats_l10s <- rats_l %>%
 str(rats_l10s)
 ```
 
+Boxplot of mean weights of different diet groups excluding the first measurement
 
- 
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(rats_l10s, aes(x = Group, y = mean, fill = Group)) +
+  geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3, fill = "black") +
+  scale_y_continuous(name = "Mean (Weight) / Time 8-64 [days]") + 
+  xlab("Diet group") + 
+  scale_fill_discrete(name = "Diet group") +
+  ggtitle("Mean weights of diet groups excluding the first measurement")
+```
+
+The boxplot showed the outliers and they could disturb further comparisons of the different diet groups.
+
+Removing outliers
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_l10s_o <- rats_l10s %>%
+    filter(
+      (mean > 250 & Group == 1) | 
+      (mean < 550 & Group == 2) |
+      (mean > 500 & Group == 3))  %>% 
+      ungroup()
+str(rats_l10s_o)
+```
+
+Boxplot of the mean value without the outlier
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(rats_l10s_o, aes(x = Group, y = mean, fill = Group)) +
+  geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3, fill = "black") +
+  scale_y_continuous(name = "Mean (Weight) / Time 8-64 [days]") +
+  xlab("Diet group") + 
+  scale_fill_discrete(name = "Diet group") +
+  ggtitle("Mean weights of diet groups without the outlier")
+```
+
+This time there were no outlier values in the boxplot Mean weights of diet groups during 8 to 64 days.
+
+### 6.2.5 Linear regression model and ANOVA
+
+**Note:** I used ANOVA more frequently than t-test so I skip t-test.
+
+Creating a new data table rats_l10s_b. 
+The weight baseline values were created by the first weigh measurement on day 1 (WD1) as a new variable to the summary data. 
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_l10s_b <- rats_l10s %>%
+  mutate(baseline = rats$WD1)
+rats_l10s_b %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(height = "200px")
+``` 
+
+
+To find which diet group had the highest increase in weight during the measurement period,  anova tests were done using this new data 'rats_l10s_b' with the mean weight values and the baseline weight values.
+
+Linear regression model of mean values in different diet groups
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_lrm1 <- lm(mean ~ Group, data = rats_l10s_b)
+round(rats_lrm1$coefficients, digits = 2) %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+```
+
+The model showed that the mean value of group 2 was 222g higher and the mean value of group 3 was 262g higher than that of group 1.
+
+Examine the group means using a post-hoc test after the ANOVA to find whether the diet groups differed to each other.
+
+The model shows that the mean value of group 2 is 222g higher and the mean value of group 3 is 262g higher compared to group 1 mean weights. Let's have a look now if the diet groups differ to each other. With a post-hoc test after the ANOVA we can check the group means.
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_anova1 <- anova(rats_lrm1)
+rats_anova1
+```
+
+The ANOVA of the linear model (mean weight ~ diet groups) showed that group 2 had a significant different weight increase compared to group 1 & 3.
+
+Perform an ANOVA and a post-hoc test (TukeyHSD) to find whether group means of diet groups were different from each other. The dataset `rats_l10s_b` was without the first measurement (start value) and inluded the outlier values.
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_anova2 <- aov(mean ~ Group, data = rats_l10s_b)
+summary(rats_anova2)
+TukeyHSD(rats_anova2, "Group", ordered = TRUE, conf.level = 0.95)
+```
+
+This post-hoc test provided the differences between the diet groups. Group 1 & 2 were significantly different in mean weight. So were Group 1 & 3. Group 2 and 3 were not significantly different in the mean weight mean, influenced by the outlier.
+
+The difference of each group to the baselines:
+
+The linear model with the mean as the response
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_lrm2 <- lm(mean ~ baseline + Group, data = rats_l10s_b)
+round(rats_lrm2$coefficients, digits = 2) %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center")
+```
+
+That was the regression model of mean weights compared to the weight baseline (the first weight measurement of each dietary group). The results shows that the weight difference between baseline and group 2 was 34g. The weight difference between baseline and  group 3 and baseline was 23g. Therefore Group 2 has the highest weight increase rates during the measurement period.
+
+```{r, rats14, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+rats_anova3 <- anova(rats_lrm2)
+rats_anova3
+```
+
+The baseline had a significant influence in the weight increase in different diet groups. Group 2 had a significant weight increase relative to the baseline, compared to group 1 & 3. Diet 2 may lead to the highest weight increase.
 
 ## 6.3 Linear mixed effects models for normal response variables
 
