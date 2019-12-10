@@ -1,6 +1,6 @@
-# Chapter 6: Analysis of longitudinal data
+# Chapter 6 Analysis of longitudinal data
 
-(3.12.-9.12.2019)
+(3.12.-10.12.2019)
 
 - **Data wrangling**
 
@@ -14,8 +14,13 @@
     
     https://raw.githubusercontent.com/KimmoVehkalahti/MABS/master/Examples/data/rats.txt
 
+- **Note:**
+
+    6.2-6.5 Analyses of chapter 8 of MABS using the RATS data (rats_l)
     
-## 6.1 Load the wide and long data sets
+    6.6-6.8 Analyses of chapter 9 of MABS using the BPRS data (bprs_l)
+    
+## 6.1 Loading the wide and long data sets
 
 Load and check the data sets
 
@@ -60,7 +65,7 @@ str(rats_l)
 ```
 
 
-The BPRS data set
+The BPRS dataset
 
 A total 40 male subjects were measured with 2 treatment groups using BPRS (Brief Psychiatric Rating Scale). One BPRS measurement was conducted before treatment started (week0), and weekly measurements followed up to 8 weeks. The BPRS assesses the levels of 18 symptom constructs to evaluate whether patients have schizophrenia  (Vehkalahti & Everitt, 2019). The levels of symptoms constructs were from 1 (not present) to 7 (extremely severe).
 
@@ -80,7 +85,7 @@ knitr::kable(bprs_l, caption = "The long BPRS data 'bprs_l'") %>%
 ```  
 
 
-The RATS data set
+The RATS dataset
 The data consisted of measurements on how rats grew. Three groups of rats got different diets. The body weight of every animal was measured over a period of 9 weeks. The research question is whether the growth profiles of the different diet groups differ (Vehkalahti & Everitt, 2019). 
 
 The long RATS data 'rats_l' 
@@ -99,9 +104,11 @@ knitr::kable(rats_l, caption = "The long RATS data 'rats_l'") %>%
   scroll_box(height = "200px")
 ```
 
-## 6.2 Graphical displays and summary measure approach
+## Part 1 Analyses of chapter 8 of MABS using the RATS data (rats_l)
 
-Analyses of chapter 8 of MABS using the RATS data (rats_l)
+**6.2-6.5**
+
+## 6.2 Standardizing the dataset and exploring the data graphically
 
 ### 6.2.1 Exploring the data graphically
 
@@ -115,11 +122,7 @@ ggplot(rats_l, aes(x = Time, y = Weight,linetype = ID)) +
  ggtitle("The long RATS data 'rats_l'")
 ```
 
-
-
 Rat’s starting weights in group 2 & 3 were higher than in group 1 and the weights in group 2 & 3 increased in quite high rates. The weights in group 1 increased in a smaller rate.
-
-
 
 ### 6.2.2 Standardizing the dataset
 
@@ -133,7 +136,7 @@ rats_l <- rats_l %>%
 str(rats_l)
 ```
 
-Plot the standardised data
+### 6.2.3 Plotting the standardised data
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 ggplot(rats_l, aes(x = Time, y = StdWeight, linetype = ID)) +
@@ -146,7 +149,9 @@ ggplot(rats_l, aes(x = Time, y = StdWeight, linetype = ID)) +
 ```
 
 
-### 6.2.3 Mean profiles
+## 6.3 Profiles
+
+### 6.3.1 Adding categorical variable
 
 Add the Time as a categorical variable "Time1"
 
@@ -156,6 +161,8 @@ rats_l <- rats_l %>%
   ungroup()
 str(rats_l)
 ```
+
+### 6.3.2 Boxplot
 
 The overview of rats' weights over the whole measurement period with boxplots. Different diet groups were in different colors.
 
@@ -180,7 +187,7 @@ rats_s <- rats_l %>%
 str(rats_s)
 ```
 
-Plot the mean profiles
+### 6.3.3 Plotting the mean profiles
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 ggplot(rats_s, aes(x = Time, y = mean, linetype = Group,  color = Group, shape = Group)) +
@@ -197,9 +204,9 @@ ggplot(rats_s, aes(x = Time, y = mean, linetype = Group,  color = Group, shape =
 
 This graph showed the rat weight development of different diet groups during the measurement period. Group 1 started at a lower level and the weight increased slightly . In Group 2 and group 3, weights started from a higher values and then decreased. The standard errors in group 2 & 3 were higher, which indicated that the weight difference between the individual rats was bigger within the diet group.
 
-### 6.2.4 Finding the outlier
+## 6.4 Finding the outlier
 
-Calculating the mean value of weight per diet group
+### 6.4.1 Creating summary variable and calculating the mean weights of every group
 
 Create a summary data by Group and ID with mean as the summary variable
 
@@ -212,7 +219,7 @@ rats_l10s <- rats_l %>%
 str(rats_l10s)
 ```
 
-Boxplot of mean weights of different diet groups excluding the first measurement
+### 6.4.2 Boxplot of mean weights of different diet groups excluding the first measurement
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 ggplot(rats_l10s, aes(x = Group, y = mean, fill = Group)) +
@@ -226,7 +233,7 @@ ggplot(rats_l10s, aes(x = Group, y = mean, fill = Group)) +
 
 The boxplot showed the outliers and they could disturb further comparisons of the different diet groups.
 
-Removing outliers
+### 6.4.3 Removing outlier
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 rats_l10s_o <- rats_l10s %>%
@@ -238,7 +245,7 @@ rats_l10s_o <- rats_l10s %>%
 str(rats_l10s_o)
 ```
 
-Boxplot of the mean value without the outlier
+### 6.4.Boxplot of the mean value without the outlier
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 ggplot(rats_l10s_o, aes(x = Group, y = mean, fill = Group)) +
@@ -252,7 +259,7 @@ ggplot(rats_l10s_o, aes(x = Group, y = mean, fill = Group)) +
 
 This time there were no outlier values in the boxplot Mean weights of diet groups during 8 to 64 days.
 
-### 6.2.5 Linear regression model and ANOVA
+## 6.5 Linear regression model and ANOVA
 
 **Note:** I used ANOVA more frequently than t-test so I skip t-test.
 
@@ -265,10 +272,9 @@ rats_l10s_b <- rats_l10s %>%
 rats_l10s_b %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(height = "200px")
 ``` 
 
-
 To find which diet group had the highest increase in weight during the measurement period,  anova tests were done using this new data 'rats_l10s_b' with the mean weight values and the baseline weight values.
 
-Linear regression model of mean values in different diet groups
+### 6.5.1 Linear regression model 1 (mean weight ~ diet groups)
 
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 rats_lrm1 <- lm(mean ~ Group, data = rats_l10s_b)
@@ -281,12 +287,16 @@ Examine the group means using a post-hoc test after the ANOVA to find whether th
 
 The model shows that the mean value of group 2 is 222g higher and the mean value of group 3 is 262g higher compared to group 1 mean weights. Let's have a look now if the diet groups differ to each other. With a post-hoc test after the ANOVA we can check the group means.
 
+### 6.5.2 ANOVA of Linear regression model 1 (mean weight ~ diet groups)
+
 ```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 rats_anova1 <- anova(rats_lrm1)
 rats_anova1
 ```
 
 The ANOVA of the linear model (mean weight ~ diet groups) showed that group 2 had a significant different weight increase compared to group 1 & 3.
+
+### 6.5.3 ANOVA with a post-hoc test
 
 Perform an ANOVA and a post-hoc test (TukeyHSD) to find whether group means of diet groups were different from each other. The dataset `rats_l10s_b` was without the first measurement (start value) and inluded the outlier values.
 
@@ -297,6 +307,8 @@ TukeyHSD(rats_anova2, "Group", ordered = TRUE, conf.level = 0.95)
 ```
 
 This post-hoc test provided the differences between the diet groups. Group 1 & 2 were significantly different in mean weight. So were Group 1 & 3. Group 2 and 3 were not significantly different in the mean weight mean, influenced by the outlier.
+
+### 6.5.4 Linear regression model 2 (mean ~ baseline + Group)
 
 The difference of each group to the baselines:
 
@@ -309,17 +321,162 @@ round(rats_lrm2$coefficients, digits = 2) %>% knitr::kable() %>% kable_styling(b
 
 That was the regression model of mean weights compared to the weight baseline (the first weight measurement of each dietary group). The results shows that the weight difference between baseline and group 2 was 34g. The weight difference between baseline and  group 3 and baseline was 23g. Therefore Group 2 has the highest weight increase rates during the measurement period.
 
-```{r, rats14, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+### 6.5.5 ANOVA of Linear regression model 2 (mean ~ baseline + Group)
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
 rats_anova3 <- anova(rats_lrm2)
 rats_anova3
 ```
 
 The baseline had a significant influence in the weight increase in different diet groups. Group 2 had a significant weight increase relative to the baseline, compared to group 1 & 3. Diet 2 may lead to the highest weight increase.
 
-## 6.3 Linear mixed effects models for normal response variables
 
-Analyses of chapter 9 of MABS using the BPRS data (bprs_l)
+## Part 2 Analyses of chapter 9 of MABS using the BPRS data (bprs_l)
+
+**6.6-6.8**
+
+(10.12.2019)
+
+### Overview plot
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+str(bprs_l)
+pairs(bprs_l, col = bprs_l$subject)
+```
+
+Plotting the bprs_l
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(bprs_l, aes(x = week, y = BPRS, shape = subject, group = treatment)) +
+  geom_point(color = "darkblue") + 
+  scale_shape_manual(values = rep(1:10, times = 2)) +
+  scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
+  scale_y_continuous(name = "BPRS value") + 
+  theme(legend.position = "bottom") + 
+  ggtitle("Overview of BPRS data") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+```
 
 
-(unfinished, see later)
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(bprs_l, aes(x = week, y = BPRS, linetype = subject)) +
+  geom_line(color = "darkblue") +
+  scale_linetype_manual(values = rep(1:6, times = 4)) +
+  facet_grid(. ~ treatment, labeller = label_both) +
+  scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
+  scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
+  theme(legend.position = "bottom") +
+  ggtitle("Overview of BPRS data by treatment") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+```
 
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(bprs_l, aes(x = week, y = BPRS)) +
+  geom_line(aes(linetype = treatment), color = "darkblue") +
+  scale_linetype_manual(values = rep(1:2, times = 1)) +
+  facet_grid(.~ subject) +
+  scale_x_continuous(name = "Weeks", breaks = seq(0,8,4)) + 
+  scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
+  theme(legend.position = "right") +
+  ggtitle("Overview of BPRS data by subject") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+```
+
+There were 40 subjects in 2 treatment groups (20 in each group). After the first BPRS determination (week 0), the treatment started and 8 more BPRS determinations followed.
+
+### Linear model 1 (BPRS ~ week + treatment)
+  
+In the first linear regression model, the BPRS value was dependent varibale and week + treatment were independent variables (explanatory variables).  
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+bprs_l_lrm1 <- lm(BPRS ~ week + treatment, data = bprs_l)
+summary(bprs_l_lrm1)
+```
+
+Weekly measurement had a significant effect on the BPRS values. With every new BRPS determination per week, the BRPS value decreases 2.2 units. Treatment 2 had a better effect on the BPRS values of the subjects but it was not significant. 
+
+To explore whether treatments helped patients and whether the subjects (patients) affected the model, the subjects were added as a random effect term to a random intercept model.
+
+## 6.6 Random intercept model (BPRS ~ week + treatment + (1 | subject))
+
+In the random intercept model, "treatment" and the measurement periods "week" were the explanatory variables. The subjects (the 40 men which undergoing the treatment and measurements) was the random-effects term. This model explored whether linear regression fitted for each subject to the other subjects.
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+bprs_l_rim <- lmer(BPRS ~ week + treatment + (1 | subject), data = bprs_l, REML = FALSE)
+summary(bprs_l_rim)
+```
+
+According to the summary, the standard error of the measurement periods 'week' in the random intercept model (0.2084) was smaller than the standard error in the linear regression model (0.2524). Similarly, the standard error of the treatment 2 in the random intercept model (1.0761) was smaller than that in the linear regression model (1.3034). They meant that the effect of subjects was taken into account in this model.
+
+Generally, the mixed model takes into account the correlations between the observations ('subjects'). So it can be more accurate than linear regression model. 
+The p-value was calculated by inverse function of the t-values (inverting the t value to the p value).
+
+## 6.7 Random Intercept and Random Slope Model (BPRS ~ week + treatment + (week | subject))
+
+Fit a random intercept and random slope model to the BPRS values. It allowed the linear regression to fit for every patient ('subject') to differ in the intercept and in the slope. 'Subject' differences was taken into account of the BPRS values and the measurement period. In this model, "week" and "subject" were random-effect terms.
+
+A total of 9 (0-8 weeks) different regression models were defined for every subject for every time period (every week).
+  
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+bprs_l_rim1 <- lmer(BPRS ~ week + treatment + (week | subject), data = bprs_l, REML = FALSE)
+summary(bprs_l_rim1)
+```
+
+The results of this model showed not much difference with the model above. ANOVA was conducted to find differences in these models.
+
+```{r, bprs_lanalysis5, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+anova(bprs_l_rim1, bprs_l_rim)
+```
+
+The ANOVA showed that the random Intercept and random Slope model (taking week and subject into account) gave a better fit for the data (p-value of 0.02) with a significant outcome.
+
+## 6.8 Random intercept and random slope model with interaction (BPRS ~ week * treatment + (week | subject))
+
+In the following random intercept and random slope model, the interaction of treatment and time (weeks) were included to see whether the treatment time period interacted with the BRPS value outcome.
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+bprs_l_rim2 <- lmer(BPRS ~ week * treatment + (week | subject), data = bprs_l, REML = FALSE)
+summary(bprs_l_rim2)
+anova(bprs_l_rim2, bprs_l_rim1)
+```
+
+The ANOVA shows that the random intercept and random slope model with interaction 'time * treatment' fitted better on the data (p-value = 0.075 < 0.1). So there was an interaction of treatments with the treament time.
+
+
+
+Check the BPRS data again on a graph
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(bprs_l, aes(x = week, y = BPRS, linetype = subject)) +
+  geom_line(color = "darkblue") +
+  scale_linetype_manual(values = rep(1:6, times = 4)) +
+  facet_grid(. ~ treatment, labeller = label_both) +
+  scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
+  scale_y_continuous(name = "BPRS values observed", breaks = seq(10,100,5)) + 
+  theme(legend.position = "bottom") + 
+  ggtitle("BPRS: original values by treatment") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+```
+
+Add fitted BPRS values created by the random intercept and random slope model with interaction 'time * treatment'  to the dataset 
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+bprs_l_fit <- fitted(bprs_l_rim2)
+bprs_l$fitted_bprs <- round(bprs_l_fit, digits = 2)
+bprs_l %>% knitr::kable() %>% kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "center") %>% scroll_box(height = "300px")
+```
+
+Draw the plot with the fitted BPRS values
+
+```{r, echo=TRUE, results='markdown', message=FALSE, warning=FALSE, fig.align = 'center'}
+ggplot(bprs_l, aes(x = week, y = fitted_bprs, linetype = subject)) +
+  geom_line(color = "darkblue") +
+  scale_linetype_manual(values = rep(1:6, times = 4)) +
+  facet_grid(. ~ treatment, labeller = label_both) +
+  scale_x_continuous(name = "Weeks", breaks = seq(0,8,1)) + 
+  scale_y_continuous(name = "BPRS values modeled", breaks = seq(10,100,5)) + 
+  theme(legend.position = "bottom") + 
+  ggtitle("BPRS: fitted values by treatment") +
+  theme(legend.box.background = element_rect(),legend.box.margin = margin(2, 2, 2, 2))
+```
